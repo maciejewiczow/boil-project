@@ -1,25 +1,21 @@
 import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { CarrierProblemView, LandingView, LinearProgrammingView } from 'views';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App: React.FC = () => (
+    <BrowserRouter>
+        <Switch>
+            <Route path="/carrier">
+                <CarrierProblemView />
+            </Route>
+            <Route path="/linear">
+                <LinearProgrammingView />
+            </Route>
+            <Route path="/">
+                <LandingView />
+            </Route>
+        </Switch>
+    </BrowserRouter>
+);
 
 export default App;
