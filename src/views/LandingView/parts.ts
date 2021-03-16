@@ -12,8 +12,6 @@ export const Wrapper = styled.div`
     align-items: center;
     justify-content: space-evenly;
     flex-flow: row wrap;
-
-    background: linear-gradient(-16deg, #2C5364, #203A43, #0F2027);
 `;
 
 export const LinkCard = styled(Link)`
