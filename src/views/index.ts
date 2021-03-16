@@ -1,9 +1,9 @@
-import CarrierProblemView from './CarrierProblemView';
+import BrokerProblemView from './BrokerProblemView/BrokerProblemView';
 import LandingView from './LandingView/LandingView';
-import LinearProgrammingView from './LinearProgrammingView';
+import LinearProgrammingView from './LinearProgrammingView/LinearProgrammingView';
 
 export {
-    CarrierProblemView,
+    BrokerProblemView,
     LandingView,
     LinearProgrammingView,
 };

@@ -1,5 +1,5 @@
 export enum RouteNames {
     Home = '/',
-    CarrierProblem = '/carrier',
+    BrokerProblem = '/broker',
     LinearProgramming = '/linear',
 }

@@ -30,7 +30,7 @@ export const defaultGradient: ThreeStopGradient = {
 
 export const gradients: Partial<Record<RouteNames, ThreeStopGradient>> = {
     [RouteNames.Home]: defaultGradient,
-    [RouteNames.CarrierProblem]: {
+    [RouteNames.BrokerProblem]: {
         stops: [
             {
                 color: '#677478',
