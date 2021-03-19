@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import { RouteDependentBackground } from 'components/RouteDependentBackground/RouteDependentBackground';
+import RouteDependentBackground from 'components/RouteDependentBackground';
 import { BrokerProblemView, LandingView, LinearProgrammingView } from 'views';
 import { RouteNames } from 'appConstants';
 

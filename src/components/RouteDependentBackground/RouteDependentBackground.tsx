@@ -1,7 +1,5 @@
 import React from 'react';
-import { useLocation } from 'react-router';
-import { RouteNames } from 'appConstants';
-import { defaultGradient, gradients } from './gradients';
+import { useLocationGradient } from './gradients';
 import { Wrapper, BackgroundSvg, LinearGradient, VariableColorStop } from './parts';
 
 interface ClassNameProps {
@@ -9,9 +7,7 @@ interface ClassNameProps {
 }
 
 export const RouteDependentBackground: React.FC<ClassNameProps> = ({ className, children }) => {
-    const location = useLocation();
-
-    const { angle, stops } = gradients[location.pathname as RouteNames] ?? defaultGradient;
+    const { angle, stops } = useLocationGradient();
 
     return (
         <Wrapper className={className}>
