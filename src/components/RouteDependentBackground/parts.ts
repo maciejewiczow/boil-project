@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 
 export const Wrapper = styled.div`
-    min-width: 100vw;
     min-height: 100vh;
     position: relative;
 `;
@@ -16,7 +15,7 @@ export const BackgroundSvg = styled.svg`
     pointer-events: none;
 `;
 
-export const transition = '1.5s ease-in-out';
+const transition = '1.5s ease-in-out';
 
 export const VariableColorStop = styled.stop`
     transition: stop-color ${transition}, offset ${transition};

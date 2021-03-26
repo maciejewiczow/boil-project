@@ -1,7 +1,11 @@
 import React from 'react';
+import { PageContent, PageHeader, PageWrapper } from '../PageLayoutParts';
 
 const BrokerProblemView: React.FC = () => (
-    <div>Zagadnienie pośrednika</div>
+    <PageWrapper>
+        <PageHeader>Zagadnienie pośrednika</PageHeader>
+        <PageContent />
+    </PageWrapper>
 );
 
 export default BrokerProblemView;

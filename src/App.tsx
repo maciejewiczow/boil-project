@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import RouteDependentBackground from 'components/RouteDependentBackground';
 import { BrokerProblemView, LandingView, LinearProgrammingView } from 'views';
-import { RouteNames } from 'appConstants';
+import { RouteNames } from './appConstants';
 
 const App: React.FC = () => (
     <BrowserRouter>
