@@ -137,7 +137,10 @@
                 "exceptRange": true
             }
         ],
+        "max-classes-per-file": "off",
+        "no-plusplus": "off",
         "comma-dangle": "off",
+        "@typescript-eslint/lines-between-class-members": ["warn", "always", { "exceptAfterSingleLine": true }],
         "@typescript-eslint/comma-dangle": ["warn", "always-multiline"],
         "no-shadow": "off",
         "@typescript-eslint/no-shadow": ["warn"],
