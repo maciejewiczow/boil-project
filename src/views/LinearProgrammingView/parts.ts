@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { PageWrapper as OriginalPageWrapper } from 'views/PageLayoutParts';
+import { PageWrapper as OriginalPageWrapper, PageContent as OriginalPageContent } from 'views/PageLayoutParts';
 
 export const PageWrapper = styled(OriginalPageWrapper)`
     grid-template-areas:
@@ -9,3 +9,8 @@ export const PageWrapper = styled(OriginalPageWrapper)`
     grid-column-gap: 12px;
 `;
 
+
+export const PageContent = styled(OriginalPageContent)`
+    padding: 0;
+    overflow: hidden;
+`;
