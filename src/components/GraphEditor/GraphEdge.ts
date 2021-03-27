@@ -1,6 +1,8 @@
+import { v4 as uuid } from 'uuid';
 import { IEdge } from 'react-digraph';
 
 export class GraphEdge implements IEdge {
+    id: string = uuid();
     type = 'default';
 
     get handleText() {
@@ -8,7 +10,7 @@ export class GraphEdge implements IEdge {
     }
 
     get handleTooltipText() {
-        return `Koszt połączenia: ${this.weight}`;
+        return `Koszt trasy: ${this.weight}`;
     }
 
     constructor(

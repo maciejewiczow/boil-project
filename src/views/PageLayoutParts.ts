@@ -6,7 +6,7 @@ export const PageWrapper = styled.div`
     height: 1px;
 
     display: grid;
-    grid-template-columns: auto 65% auto;
+    grid-template-columns: 17.5% 65% 17.5%;
     grid-template-rows: auto 1fr;
 
     grid-template-areas:

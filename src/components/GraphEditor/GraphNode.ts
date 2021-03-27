@@ -4,7 +4,7 @@ import { v4 as uuid } from 'uuid';
 export abstract class GraphNode implements INode {
     id: string = uuid();
     // property used by react-digraph, but we are ignoring it's type system
-    type = 'default';
+    readonly type = 'default';
 
     constructor(
         public sequenceNumber: number,
@@ -13,15 +13,26 @@ export abstract class GraphNode implements INode {
     ) {}
 
     abstract get title(): string;
+    abstract get typeName(): string;
 }
 
 export class BrokerNode extends GraphNode {
-    get title(): string {
+    get title() {
         return `P ${this.sequenceNumber}`;
+    }
+
+    // eslint-disable-next-line class-methods-use-this
+    get typeName() {
+        return 'Pośrednik';
     }
 }
 
 export class CustomerNode extends GraphNode {
+    // eslint-disable-next-line class-methods-use-this
+    get typeName(): string {
+        return 'Odbiorca';
+    }
+
     get title(): string {
         return `O ${this.sequenceNumber}`;
     }
@@ -37,6 +48,11 @@ export class CustomerNode extends GraphNode {
 }
 
 export class SupplierNode extends GraphNode {
+    // eslint-disable-next-line class-methods-use-this
+    get typeName(): string {
+        return 'Dostawca';
+    }
+
     get title(): string {
         return `D ${this.sequenceNumber}`;
     }

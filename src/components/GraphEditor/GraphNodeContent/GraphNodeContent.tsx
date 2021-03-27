@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrokerNode, CustomerNode, GraphNode, SupplierNode } from '../GraphNode';
+import { CustomerNode, GraphNode, SupplierNode } from '../GraphNode';
 import { Wrapper, NodeTypeText, Name, NodeValue } from './parts';
 
 interface GraphNodeProps {
@@ -16,14 +16,12 @@ const GraphNodeContent: React.FC<GraphNodeProps> = ({
 }) => (
     <Wrapper className={className} isSelected={isSelected}>
         <NodeTypeText y="-25">
-            {node instanceof SupplierNode && 'Dostawca'}
-            {node instanceof CustomerNode && 'Odbiorca'}
-            {node instanceof BrokerNode && 'Pośrednik'}
+            {node.typeName}
         </NodeTypeText>
         <Name>{node.title}</Name>
         <NodeValue y="25">
-            {node instanceof SupplierNode && <>Podaż: {node.supply}</>}
-            {node instanceof CustomerNode && <>Popyt: {node.demand}</>}
+            {node instanceof SupplierNode && <React.Fragment>Podaż: {node.supply}</React.Fragment>}
+            {node instanceof CustomerNode && <React.Fragment>Popyt: {node.demand}</React.Fragment>}
         </NodeValue>
     </Wrapper>
 );

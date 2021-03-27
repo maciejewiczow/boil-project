@@ -32,6 +32,8 @@ export const LinkCard = styled(Link)`
 
     &:hover{
         box-shadow: 0 8px 16px 3px rgba(0,0,0,0.65);
+        color: inherit;
+        text-decoration: none;
     }
 `;
 
