@@ -1,8 +1,5 @@
 import styled from 'styled-components';
 
-export const EdgeTip = styled.path``;
-export const SelectedEdgeTip = styled.path``;
-
 export const Wrapper = styled.div`
     position: relative;
     height: 100%;
@@ -12,25 +9,16 @@ export const Wrapper = styled.div`
     }
 
     .edge {
-        marker-end: url(#end-no-arrow);
         stroke: #555;
-
-        &.selected {
-            marker-end: url(#end-no-arrow-selected);
-        }
 
         .edge-handle-text {
             fill: black;
             stroke: none;
         }
-    }
 
-    ${EdgeTip} {
-        stroke: #555;
-    }
-
-    ${SelectedEdgeTip} {
-        stroke: #1e90ff;
+        &.selected .edge-handle-text {
+            stroke: none;
+        }
     }
 `;
 
