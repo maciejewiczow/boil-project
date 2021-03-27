@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
 import FormGroup from 'react-bootstrap/esm/FormGroup';
 import { BrokerNode, CustomerNode, GraphNode, SupplierNode } from '../GraphNode';
@@ -10,6 +10,12 @@ interface GraphNodeDetailsProps {
 }
 
 export const GraphNodeDetails: React.FC<GraphNodeDetailsProps> = ({ selectedNode, onNodeChange }) => {
+    const inputRef = React.useRef<HTMLSelectElement>(null);
+
+    useEffect(() => {
+        inputRef.current?.focus();
+    }, [selectedNode.id]);
+
     const updateNodeType = (e: React.ChangeEvent<HTMLSelectElement>) => {
         let newNode: GraphNode;
         switch (e.target.value) {
@@ -25,11 +31,13 @@ export const GraphNodeDetails: React.FC<GraphNodeDetailsProps> = ({ selectedNode
             default:
                 return;
         }
+
         onNodeChange(Object.assign(newNode, selectedNode));
     };
 
     const updateCustomerNodeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
         const demand = Number.isNaN(e.target.valueAsNumber) ? 0 : e.target.valueAsNumber;
+
         onNodeChange(
             Object.assign(
                 new CustomerNode(0, 0),
@@ -41,6 +49,7 @@ export const GraphNodeDetails: React.FC<GraphNodeDetailsProps> = ({ selectedNode
 
     const updateSupplierNodeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
         const supply = Number.isNaN(e.target.valueAsNumber) ? 0 : e.target.valueAsNumber;
+
         onNodeChange(
             Object.assign(
                 new SupplierNode(0, 0),
@@ -57,7 +66,7 @@ export const GraphNodeDetails: React.FC<GraphNodeDetailsProps> = ({ selectedNode
             <FormWrapper>
                 <FormGroup controlId="nodeType">
                     <Form.Label>Typ węzła</Form.Label>
-                    <Form.Control as="select" value={selectedNode.constructor.name} onChange={updateNodeType}>
+                    <Form.Control ref={inputRef} as="select" value={selectedNode.constructor.name} onChange={updateNodeType}>
                         <option value={SupplierNode.name}>Dostawca</option>
                         <option value={BrokerNode.name}>Pośrednik</option>
                         <option value={CustomerNode.name}>Odbiorca</option>

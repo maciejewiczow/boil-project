@@ -11,8 +11,14 @@ interface GraphEdgeDetailsProps {
 }
 
 export const GraphEdgeDetails: React.FC<GraphEdgeDetailsProps> = ({ nodes, selectedEdge, onEdgeChange }) => {
-    const sourceNode = nodes.find(n => n.id === selectedEdge.source);
-    const targetNode = nodes.find(n => n.id === selectedEdge.target);
+    const inputRef = React.useRef<HTMLInputElement>(null);
+
+    React.useEffect(() => {
+        inputRef.current?.focus();
+    }, [selectedEdge.id]);
+
+    const sourceNode = React.useMemo(() => nodes.find(n => n.id === selectedEdge.source), [nodes, selectedEdge.source]);
+    const targetNode = React.useMemo(() => nodes.find(n => n.id === selectedEdge.target), [nodes, selectedEdge.target]);
 
     if (!sourceNode || !targetNode)
         return null;
@@ -33,7 +39,13 @@ export const GraphEdgeDetails: React.FC<GraphEdgeDetailsProps> = ({ nodes, selec
             <FormWrapper>
                 <Form.Group controlId="edgeWeight">
                     <Form.Label>Koszt</Form.Label>
-                    <Form.Control type="number" min="0" value={selectedEdge.weight} onChange={updateEdge} />
+                    <Form.Control
+                        ref={inputRef}
+                        type="number"
+                        min="0"
+                        value={selectedEdge.weight}
+                        onChange={updateEdge}
+                    />
                 </Form.Group>
             </FormWrapper>
         </React.Fragment>
