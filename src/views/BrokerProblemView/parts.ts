@@ -22,6 +22,9 @@ export const TableInput = styled(Form.Control)`
     position: absolute;
     height: 100%;
     width: 100%;
+    border-radius: 0;
+    border-width: 0;
+    background: transparent;
 `;
 
 export const GridTable = styled.div`

@@ -37,10 +37,6 @@ const initialSuppliers: Supplier[] = [
         supply: 0,
         price: 0,
     },
-    {
-        supply: 0,
-        price: 0,
-    },
 ];
 
 const initialCustomers: Customer[] = [
