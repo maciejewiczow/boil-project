@@ -8,13 +8,11 @@ const LandingView: React.FC = () => (
     <Wrapper>
         <LinkCard to={RouteNames.BrokerProblem}>
             <CardImageWrapper src={TransportIcon} />
-            <CardDescription>
-                Problem pośrednika
-            </CardDescription>
+            <CardDescription>Zagadnienie pośrednika</CardDescription>
         </LinkCard>
         <LinkCard to={RouteNames.LinearProgramming}>
             <CardImageWrapper src={GraphIcon} />
-            <CardDescription>Cośtam sieciowe</CardDescription>
+            <CardDescription>Programowanie liniowe</CardDescription>
         </LinkCard>
     </Wrapper>
 );
