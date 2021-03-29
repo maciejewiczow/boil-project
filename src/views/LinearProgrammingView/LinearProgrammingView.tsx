@@ -93,7 +93,7 @@ const LinearProgrammingView: React.FC = () => {
 
     return (
         <PageWrapper>
-            <PageHeader>Grafowanie</PageHeader>
+            <PageHeader>Programowanie liniowe</PageHeader>
             <PageContent>
                 <GraphEditor
                     graph={graph}
