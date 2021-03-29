@@ -1,32 +1,22 @@
 import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import Table from 'react-bootstrap/Table';
-import { GrAdd } from 'react-icons/gr';
 import { BsFillPlayFill } from 'react-icons/bs';
-import { AiFillDelete } from 'react-icons/ai';
-import { join } from 'path';
+import { AiFillDelete, AiOutlinePlusCircle } from 'react-icons/ai';
+import Table from 'react-bootstrap/esm/Table';
 import { PageHeader, PageWrapper } from '../PageLayoutParts';
 import {
     PageContent,
-    PageTextInput,
-    PageTextParagraph,
-    PageButton,
     CostsWrapper,
     SuppliersWrapper,
     CustomersWrapper,
-    Row,
+    TableInput,
+    GridCell,
+    StickyGridCell,
+    SubmitArea,
+    ScrollTable,
+    SectionHeader,
 } from './parts';
-
-/*
-    dostawcy         odbiorcy
-    D1 [] []
-    D2 [] []
-    D3 [] []
-      [+]
-
-    Koszty tras
- */
 
 interface Supplier {
     supply: number;
@@ -69,13 +59,25 @@ const initialCustomers: Customer[] = [
 ];
 
 const initialCosts: number[][] = initialSuppliers.map(_ => (
-    new Array(initialSuppliers.length).fill(0)
+    new Array(initialCustomers.length).fill(0)
 ));
 
 const BrokerProblemView: React.FC = () => {
     const [suppliers, setSuppliers] = useState<Supplier[]>(initialSuppliers);
     const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
     const [costs, setCosts] = useState<number[][]>(initialCosts);
+
+    const updateSupplier = (index: number, prop: keyof Supplier) => (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newArr = [...suppliers];
+        newArr[index][prop] = e.target.valueAsNumber;
+        setSuppliers(newArr);
+    };
+
+    const updateCustomer = (index: number, prop: keyof Customer) => (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newArr = [...customers];
+        newArr[index][prop] = e.target.valueAsNumber;
+        setCustomers(newArr);
+    };
 
     const addSupplier = () => {
         setSuppliers([
@@ -102,94 +104,126 @@ const BrokerProblemView: React.FC = () => {
         setCosts(costs.map(row => [...row, 0]));
     };
 
+    const removeCutomer = (index: number) => () => {
+        setCustomers([...customers.filter((_, i) => i !== index)]);
+        setCosts(costs.map(row => row.filter((_, i) => i !== index)));
+    };
+
+    const removeSupplier = (index: number) => () => {
+        setSuppliers([...suppliers.filter((_, i) => i !== index)]);
+        setCosts([...costs.filter((_, i) => i !== index)]);
+    };
+
     return (
         <PageWrapper>
             <PageHeader>Zagadnienie pośrednika</PageHeader>
             <PageContent>
                 <SuppliersWrapper>
-                    <Row>
-                        <div>Dostawca</div> <div>podaż</div> <div>koszt</div>
-                    </Row>
-                    {suppliers.map(({ price, supply }, index) => (
-                        <Row>
-                            <span>D {index + 1}</span>
-                            <PageTextInput
-                                type="number"
-                                value={supply}
-                                min="0"
-                                onChange={e => {
-                                    const newArr = [...suppliers];
-                                    newArr[index].supply = e.target.valueAsNumber;
-                                    setSuppliers(newArr);
-                                }}
-                            />
-                            <PageTextInput
-                                type="number"
-                                value={price}
-                                min="0"
-                                onChange={e => {
-                                    const newArr = [...suppliers];
-                                    newArr[index].price = e.target.valueAsNumber;
-                                    setSuppliers(newArr);
-                                }}
-                            />
-                            <Button variant="danger"><AiFillDelete /></Button>
-                        </Row>
-                    ))}
-                    <Row>
-                        <Button variant="success" onClick={addSupplier}><GrAdd /></Button>
-                    </Row>
+                    <SectionHeader>Dostawcy</SectionHeader>
+                    <ScrollTable>
+                        <StickyGridCell col={1}>Dostawca</StickyGridCell>
+                        <StickyGridCell col={2}>Podaż</StickyGridCell>
+                        <StickyGridCell col={3}>Koszt</StickyGridCell>
+                        <StickyGridCell col={4}>
+                            <Button variant="success" onClick={addSupplier}><AiOutlinePlusCircle /></Button>
+                        </StickyGridCell>
+                        {suppliers.map(({ price, supply }, index) => (
+                            <React.Fragment key={index}>
+                                <GridCell col={1}>D {index + 1}</GridCell>
+                                <GridCell col={2}>
+                                    <Form.Control
+                                        type="number"
+                                        min="0"
+                                        value={supply}
+                                        onChange={updateSupplier(index, 'supply')}
+                                    />
+                                </GridCell>
+                                <GridCell col={3}>
+                                    <Form.Control
+                                        type="number"
+                                        value={price}
+                                        min="0"
+                                        onChange={updateSupplier(index, 'price')}
+                                    />
+                                </GridCell>
+                                <GridCell col={4}>
+                                    {suppliers.length > 1 && (
+                                        <Button
+                                            variant="outline-danger"
+                                            onClick={removeSupplier(index)}
+                                            tabIndex={-1}
+                                        >
+                                            <AiFillDelete />
+                                        </Button>
+                                    )}
+                                </GridCell>
+                            </React.Fragment>
+                        ))}
+                    </ScrollTable>
                 </SuppliersWrapper>
                 <CustomersWrapper>
-                    <div>Odbiorca popyt cena</div>
-                    {customers.map(({ price, demand }, index) => (
-                        <Row key={index}>
-                            <span>O {index + 1}</span>
-                            <PageTextInput
-                                type="number"
-                                value={demand}
-                                min="0"
-                                onChange={e => {
-                                    const newArr = [...customers];
-                                    newArr[index].demand = e.target.valueAsNumber;
-                                    setCustomers(newArr);
-                                }}
-                            />
-                            <PageTextInput
-                                type="number"
-                                value={price}
-                                min="0"
-                                onChange={e => {
-                                    const newArr = [...customers];
-                                    newArr[index].price = e.target.valueAsNumber;
-                                    setCustomers(newArr);
-                                }}
-                            />
-                        </Row>
-                    ))}
-                    <Row>
-                        <Button variant="success" onClick={addCustomer}><GrAdd /></Button>
-                    </Row>
+                    <SectionHeader>Odbiorcy</SectionHeader>
+                    <ScrollTable>
+                        <StickyGridCell col={1}>Odbiorca</StickyGridCell>
+                        <StickyGridCell col={2}>Popyt</StickyGridCell>
+                        <StickyGridCell col={3}>Cena</StickyGridCell>
+                        <StickyGridCell col={4}>
+                            <Button variant="success" onClick={addCustomer}><AiOutlinePlusCircle /></Button>
+                        </StickyGridCell>
+                        {customers.map(({ price, demand }, index) => (
+                            <React.Fragment key={index}>
+                                <GridCell col={1}>O {index + 1}</GridCell>
+                                <GridCell col={2}>
+                                    <Form.Control
+                                        type="number"
+                                        value={demand}
+                                        min="0"
+                                        onChange={updateCustomer(index, 'demand')}
+                                    />
+                                </GridCell>
+                                <GridCell col={3}>
+                                    <Form.Control
+                                        type="number"
+                                        value={price}
+                                        min="0"
+                                        onChange={updateCustomer(index, 'price')}
+                                    />
+                                </GridCell>
+                                <GridCell col={4}>
+                                    {customers.length > 1 && (
+                                        <Button
+                                            variant="outline-danger"
+                                            onClick={removeCutomer(index)}
+                                            tabIndex={-1}
+                                        >
+                                            <AiFillDelete />
+                                        </Button>
+                                    )}
+                                </GridCell>
+                            </React.Fragment>
+                        ))}
+                    </ScrollTable>
                 </CustomersWrapper>
                 <CostsWrapper>
-                    <Table striped bordered hover>
+                    <SectionHeader>Koszty</SectionHeader>
+                    <Table bordered striped cellPadding="0">
                         <thead>
                             <tr>
-                                <td>bayo yayo</td>
-                                {customers.map((c, i) => <td>O {i + 1}</td>)}
+                                <th />
+                                {customers.map((c, i) => <th>O {i + 1}</th>)}
                             </tr>
                         </thead>
                         <tbody>
                             {costs.map((row, i) => (
                                 <tr>
-                                    <td>D {i + 1}</td>
+                                    <th>D {i + 1}</th>
                                     {row.map((cost, j) => (
                                         <td>
-                                            <PageTextInput
+                                            <TableInput
                                                 type="number"
                                                 value={cost}
                                                 min="0"
-                                                onChange={e => {
+                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                                     const newArr = [...costs];
                                                     newArr[i][j] = e.target.valueAsNumber;
                                                     setCosts(newArr);
@@ -201,10 +235,15 @@ const BrokerProblemView: React.FC = () => {
                             ))}
                         </tbody>
                     </Table>
-                    <Row>
-                        <Button variant="success"><BsFillPlayFill /></Button>
-                    </Row>
                 </CostsWrapper>
+                <SubmitArea>
+                    <Button
+                        variant="success"
+                        onClick={() => console.log(suppliers, customers, costs)}
+                    >
+                        Oblicz <BsFillPlayFill />
+                    </Button>
+                </SubmitArea>
             </PageContent>
         </PageWrapper>
     );

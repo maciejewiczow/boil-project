@@ -2,8 +2,6 @@ import styled from 'styled-components';
 
 export const PageWrapper = styled.div`
     min-height: 100vh;
-    // whithout this "height: 100%" does not work in child elements
-    height: 1px;
 
     display: grid;
     grid-template-columns: 17.5% 65% 17.5%;
