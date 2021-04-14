@@ -5,6 +5,9 @@ import { BsFillPlayFill } from 'react-icons/bs';
 import { AiFillDelete, AiOutlinePlusCircle } from 'react-icons/ai';
 import Table from 'react-bootstrap/esm/Table';
 import { PageHeader, PageWrapper } from '../PageLayoutParts';
+import { Supplier, Customer } from './interfaces';
+import { initialSuppliers, initialCustomers, initialCosts } from './constants';
+import { script } from './alg';
 import {
     PageContent,
     CostsWrapper,
@@ -17,46 +20,6 @@ import {
     ScrollTable,
     SectionHeader,
 } from './parts';
-
-interface Supplier {
-    supply: number;
-    price: number;
-}
-
-interface Customer {
-    demand: number;
-    price: number;
-}
-
-const initialSuppliers: Supplier[] = [
-    {
-        supply: 0,
-        price: 0,
-    },
-    {
-        supply: 0,
-        price: 0,
-    },
-];
-
-const initialCustomers: Customer[] = [
-    {
-        demand: 0,
-        price: 0,
-    },
-    {
-        demand: 0,
-        price: 0,
-    },
-    {
-        demand: 0,
-        price: 0,
-    },
-];
-
-const initialCosts: number[][] = initialSuppliers.map(_ => (
-    new Array(initialCustomers.length).fill(0)
-));
 
 const BrokerProblemView: React.FC = () => {
     const [suppliers, setSuppliers] = useState<Supplier[]>(initialSuppliers);
@@ -237,7 +200,7 @@ const BrokerProblemView: React.FC = () => {
                 <SubmitArea>
                     <Button
                         variant="success"
-                        onClick={() => console.log(suppliers, customers, costs)}
+                        onClick={() => script(suppliers, customers, costs)}
                     >
                         Oblicz <BsFillPlayFill />
                     </Button>
