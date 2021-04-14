@@ -75,6 +75,12 @@ const BrokerProblemView: React.FC = () => {
         setCustomers(newArr);
     };
 
+    const updateCosts = (i: number, j: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newArr = [...costs];
+        newArr[i][j] = e.target.valueAsNumber;
+        setCosts(newArr);
+    };
+
     const addSupplier = () => {
         setSuppliers([
             ...suppliers,
@@ -119,7 +125,7 @@ const BrokerProblemView: React.FC = () => {
                     <ScrollTable>
                         <StickyGridCell col={1}>Dostawca</StickyGridCell>
                         <StickyGridCell col={2}>Podaż</StickyGridCell>
-                        <StickyGridCell col={3}>Koszt</StickyGridCell>
+                        <StickyGridCell col={3}>Cena kupna</StickyGridCell>
                         <StickyGridCell col={4}>
                             <Button variant="success" onClick={addSupplier}><AiOutlinePlusCircle /></Button>
                         </StickyGridCell>
@@ -162,7 +168,7 @@ const BrokerProblemView: React.FC = () => {
                     <ScrollTable>
                         <StickyGridCell col={1}>Odbiorca</StickyGridCell>
                         <StickyGridCell col={2}>Popyt</StickyGridCell>
-                        <StickyGridCell col={3}>Cena</StickyGridCell>
+                        <StickyGridCell col={3}>Cena sprzedaży</StickyGridCell>
                         <StickyGridCell col={4}>
                             <Button variant="success" onClick={addCustomer}><AiOutlinePlusCircle /></Button>
                         </StickyGridCell>
@@ -206,7 +212,7 @@ const BrokerProblemView: React.FC = () => {
                         <thead>
                             <tr>
                                 <th />
-                                {customers.map((c, i) => <th>O {i + 1}</th>)}
+                                {customers.map((_, i) => <th>O {i + 1}</th>)}
                             </tr>
                         </thead>
                         <tbody>
@@ -219,11 +225,7 @@ const BrokerProblemView: React.FC = () => {
                                                 type="number"
                                                 value={cost}
                                                 min="0"
-                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                                    const newArr = [...costs];
-                                                    newArr[i][j] = e.target.valueAsNumber;
-                                                    setCosts(newArr);
-                                                }}
+                                                onChange={updateCosts(i, j)}
                                             />
                                         </td>
                                     ))}
