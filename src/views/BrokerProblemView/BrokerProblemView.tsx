@@ -3,28 +3,34 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { BsFillPlayFill } from 'react-icons/bs';
 import { AiFillDelete, AiOutlinePlusCircle } from 'react-icons/ai';
-import Table from 'react-bootstrap/esm/Table';
+import Table from 'react-bootstrap/Table';
 import { PageHeader, PageWrapper } from '../PageLayoutParts';
-import { Supplier, Customer } from './interfaces';
+import { Supplier, Customer, Results } from './interfaces';
 import { initialSuppliers, initialCustomers, initialCosts } from './constants';
-import { script } from './alg';
+import { calculateOptimalTransportTable } from './alg';
 import {
     PageContent,
     CostsWrapper,
     SuppliersWrapper,
     CustomersWrapper,
+    ResultsWrapper,
     TableInput,
     GridCell,
     StickyGridCell,
     SubmitArea,
     ScrollTable,
     SectionHeader,
+    ProfitWrapper,
+    ProfitLabel,
+    ProfitText,
+    SectionHeaderText,
 } from './parts';
 
 const BrokerProblemView: React.FC = () => {
     const [suppliers, setSuppliers] = useState<Supplier[]>(initialSuppliers);
     const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
     const [costs, setCosts] = useState<number[][]>(initialCosts);
+    const [results, setResult] = useState<Results | undefined>(undefined);
 
     const updateSupplier = (index: number, prop: keyof Supplier) => (e: React.ChangeEvent<HTMLInputElement>) => {
         const newArr = [...suppliers];
@@ -84,7 +90,7 @@ const BrokerProblemView: React.FC = () => {
             <PageHeader>Zagadnienie pośrednika</PageHeader>
             <PageContent>
                 <SuppliersWrapper>
-                    <SectionHeader>Dostawcy</SectionHeader>
+                    <SectionHeader><SectionHeaderText>Dostawcy</SectionHeaderText></SectionHeader>
                     <ScrollTable>
                         <StickyGridCell col={1}>Dostawca</StickyGridCell>
                         <StickyGridCell col={2}>Podaż</StickyGridCell>
@@ -127,7 +133,7 @@ const BrokerProblemView: React.FC = () => {
                     </ScrollTable>
                 </SuppliersWrapper>
                 <CustomersWrapper>
-                    <SectionHeader>Odbiorcy</SectionHeader>
+                    <SectionHeader><SectionHeaderText>Odbiorcy</SectionHeaderText></SectionHeader>
                     <ScrollTable>
                         <StickyGridCell col={1}>Odbiorca</StickyGridCell>
                         <StickyGridCell col={2}>Popyt</StickyGridCell>
@@ -170,7 +176,7 @@ const BrokerProblemView: React.FC = () => {
                     </ScrollTable>
                 </CustomersWrapper>
                 <CostsWrapper>
-                    <SectionHeader>Koszty</SectionHeader>
+                    <SectionHeader><SectionHeaderText>Koszty</SectionHeaderText></SectionHeader>
                     <Table bordered striped cellPadding="0">
                         <thead>
                             <tr>
@@ -200,11 +206,40 @@ const BrokerProblemView: React.FC = () => {
                 <SubmitArea>
                     <Button
                         variant="success"
-                        onClick={() => script(suppliers, customers, costs)}
+                        onClick={() => setResult(calculateOptimalTransportTable(suppliers, customers, costs))}
                     >
                         Oblicz <BsFillPlayFill />
                     </Button>
                 </SubmitArea>
+                {results && (
+                    <ResultsWrapper>
+                        <SectionHeader>
+                            <SectionHeaderText>
+                                Wynik
+                            </SectionHeaderText>
+                            <ProfitWrapper>
+                                <ProfitLabel>Zysk</ProfitLabel>
+                                <ProfitText>{results.totalProfit}</ProfitText>
+                            </ProfitWrapper>
+                        </SectionHeader>
+                        <Table bordered striped cellPadding="0">
+                            <thead>
+                                <tr>
+                                    <th />
+                                    {customers.map((_, i) => <th>O {i + 1}</th>)}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {results.transportTable.map((row, i) => (
+                                    <tr>
+                                        <th>D {i + 1}</th>
+                                        {row.map(value => (<td>{value}</td>))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                    </ResultsWrapper>
+                )}
             </PageContent>
         </PageWrapper>
     );

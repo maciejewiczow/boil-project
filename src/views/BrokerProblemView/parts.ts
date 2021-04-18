@@ -7,7 +7,7 @@ export const PageContent = styled(OriginalPageContent)`
 
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto auto;
+    grid-auto-rows: min-content;
 
     grid-row-gap: 24px;
     grid-column-gap: 32px;
@@ -15,7 +15,9 @@ export const PageContent = styled(OriginalPageContent)`
     grid-template-areas:
         "suppliers customers"
         "costs costs"
-        "submit submit";
+        "submit submit"
+        "results results";
+
 `;
 
 export const TableInput = styled(Form.Control)`
@@ -49,8 +51,15 @@ export const StickyGridCell = styled(GridCell)`
     background: white;
 `;
 
-export const SectionHeader = styled.h3`
+export const SectionHeader = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
     margin-bottom: 16px;
+`;
+
+export const SectionHeaderText = styled.h3`
+    margin-bottom: 0;
 `;
 
 export const CustomersWrapper = styled.div`
@@ -75,6 +84,33 @@ export const CostsWrapper = styled.div`
     th {
         white-space: nowrap;
     }
+`;
+
+export const ResultsWrapper = styled.div`
+    grid-area: results;
+
+    overflow-x: auto;
+
+    td {
+        min-width: 70px;
+    }
+
+    th {
+        white-space: nowrap;
+    }
+`;
+
+export const ProfitWrapper = styled.div`
+    text-align: right;
+`;
+
+export const ProfitLabel = styled.div`
+    font-size: 12px;
+    color: #999;
+`;
+
+export const ProfitText = styled.div`
+    font-size: 22px;
 `;
 
 export const SubmitArea = styled.div`

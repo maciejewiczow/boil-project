@@ -64,7 +64,7 @@
             "ObjectExpression": { "multiline": true, "consistent": true },
             "ObjectPattern": { "multiline": true, "consistent": true }
         }],
-        "object-property-newline": ["warn", { "allowMultiplePropertiesPerLine": false }],
+        "object-property-newline": ["warn", { "allowMultiplePropertiesPerLine": true }],
         "no-restricted-syntax": ["warn", "ForInStatement", "LabeledStatement", "WithStatement"],
         "react/jsx-one-expression-per-line": "off",
         "import-newlines/enforce": [
