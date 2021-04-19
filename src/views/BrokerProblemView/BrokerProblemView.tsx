@@ -227,7 +227,7 @@ const BrokerProblemView: React.FC = () => {
                             </ProfitWrapper>
                             <ProfitWrapper>
                                 <ProfitLabel>Przychód</ProfitLabel>
-                                <ProfitText>{results.gain}</ProfitText>
+                                <ProfitText>{results.income}</ProfitText>
                             </ProfitWrapper>
                         </SectionHeader>
                         <h5>Transporty</h5>

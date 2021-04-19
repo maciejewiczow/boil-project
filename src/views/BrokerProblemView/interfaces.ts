@@ -20,5 +20,5 @@ export interface Results {
     profitTable: number[][];
     profit: number;
     cost: number;
-    gain: number;
+    income: number;
 }

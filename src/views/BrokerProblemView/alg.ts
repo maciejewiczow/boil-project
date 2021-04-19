@@ -233,24 +233,24 @@ export const calculateOptimalTransportTable = (suppliers: Supplier[], customers:
         (_, [i, __]: [number, number]) => suppliers[i].price,
     );
 
-    const cost = sum(dotMultiply(transportTable, add(puchaseCosts, costs)) as Matrix);
+    const cost: number = sum(dotMultiply(transportTable, add(puchaseCosts, costs)) as Matrix);
 
-    const gains = map(
+    const incomes = map(
         matrix(zeros(suppliers.length, customers.length)),
         (_, [__, j]: [number, number]) => customers[j].price,
     );
 
-    const gain = sum(dotMultiply(transportTable, gains) as Matrix);
+    const income: number = sum(dotMultiply(transportTable, incomes) as Matrix);
 
     console.log('Zysk', profit);
     console.log('Koszt', cost);
-    console.log('Przychód', gain);
+    console.log('Przychód', income);
 
     return {
         transportTable: transportTable.toArray() as number[][],
         profitTable: profitTable.toArray() as number[][],
         cost,
-        gain,
+        income,
         profit,
     };
 };
