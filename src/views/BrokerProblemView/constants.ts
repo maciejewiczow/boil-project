@@ -1,5 +1,40 @@
 import { Supplier, Customer } from './interfaces';
 
+// export const initialSuppliers: Supplier[] = [
+//     {
+//         supply: 10,
+//         price: 6,
+//     },
+//     {
+//         supply: 30,
+//         price: 9,
+//     },
+// ];
+
+// export const initialCustomers: Customer[] = [
+//     {
+//         demand: 10,
+//         price: 15,
+//     },
+//     {
+//         demand: 10,
+//         price: 14,
+//     },
+//     {
+//         demand: 11,
+//         price: 16,
+//     },
+// ];
+
+// // export const initialCosts: number[][] = initialSuppliers.map(_ => (
+// //    new Array(initialCustomers.length).fill(3)
+// // ));
+
+// export const initialCosts: number[][] = [
+//     [4, 7, 2],
+//     [8, 10, 4],
+// ];
+
 export const initialSuppliers: Supplier[] = [
     {
         supply: 20,
@@ -13,8 +48,8 @@ export const initialSuppliers: Supplier[] = [
 
 export const initialCustomers: Customer[] = [
     {
-        demand: 10,
-        price: 30,
+        demand: 20,
+        price: 60,
     },
     {
         demand: 28,
@@ -26,11 +61,11 @@ export const initialCustomers: Customer[] = [
     },
 ];
 
-// export const initialCosts: number[][] = initialSuppliers.map(_ => (
-//    new Array(initialCustomers.length).fill(3)
-// ));
-
 export const initialCosts: number[][] = [
     [8, 14, 17],
     [12, 9, 19],
 ];
+
+// export const initialCosts: number[][] = initialSuppliers.map(_ => (
+//    new Array(initialCustomers.length).fill(3)
+// ));

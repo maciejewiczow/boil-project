@@ -30,7 +30,7 @@ const BrokerProblemView: React.FC = () => {
     const [suppliers, setSuppliers] = useState<Supplier[]>(initialSuppliers);
     const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
     const [costs, setCosts] = useState<number[][]>(initialCosts);
-    const [results, setResult] = useState<Results | undefined>(undefined);
+    const [results, setResults] = useState<Results | undefined>(undefined);
 
     const updateSupplier = (index: number, prop: keyof Supplier) => (e: React.ChangeEvent<HTMLInputElement>) => {
         const newArr = [...suppliers];
@@ -206,7 +206,7 @@ const BrokerProblemView: React.FC = () => {
                 <SubmitArea>
                     <Button
                         variant="success"
-                        onClick={() => setResult(calculateOptimalTransportTable(suppliers, customers, costs))}
+                        onClick={() => setResults(calculateOptimalTransportTable(suppliers, customers, costs))}
                     >
                         Oblicz <BsFillPlayFill />
                     </Button>

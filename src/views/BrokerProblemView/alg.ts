@@ -1,35 +1,32 @@
+import cloneDeep from 'lodash/cloneDeep';
 import {
     zeros,
     map,
     matrix,
     Matrix,
-    subset,
     index,
     range,
     lusolve,
     squeeze,
+    subset,
     sum,
     dotMultiply,
+    flatten,
 } from 'mathjs';
-import cloneDeep from 'lodash/cloneDeep';
 import { Supplier, Customer, DualVariables, Results } from './interfaces';
 
-const isBalanced = (suppliers: Supplier[], customers: Customer[]) => {
-    const totalSupply = suppliers.map(s => s.supply).reduce((a, b) => a + b);
-    const totalDemand = customers.map(s => s.demand).reduce((a, b) => a + b);
-    return totalDemand === totalSupply;
-};
+const isBalanced = (suppliers: Supplier[], customers: Customer[]) => sum(suppliers.map(s => s.supply)) === sum(customers.map(s => s.demand));
 
 const getOptimalityFactor = (profitTable: Matrix, dualVariables: DualVariables) => (
     map(
-        matrix(zeros(profitTable.size())),
+        profitTable,
         (_, [i, j]: [number, number]) => profitTable.get([i, j]) - dualVariables.alphas[i] - dualVariables.betas[j],
     )
 );
 
 const generateProfitTable = (suppliers: Supplier[], customers: Customer[], costs: Matrix) => (
     map(
-        zeros(suppliers.length, customers.length) as Matrix,
+        matrix(zeros(suppliers.length, customers.length)),
         (_, [i, j]: [number, number]) => customers[j].price - costs.get([i, j]) - suppliers[i].price,
     )
 );
@@ -40,24 +37,34 @@ const findAndApplyCycle = (solution: Matrix, deltas: Matrix) => {
         .filter(v => v.value > 0)
         .sort((a, b) => b.value - a.value);
 
-    const solutionArray = solution.toArray() as number[][];
+    const solutionArray = solution.toArray() as (number | undefined)[][];
     const deltasArray = deltas.toArray() as number[][];
 
     const [rows, cols] = deltas.size();
     for (const delta of sortedDeltas) {
         for (let i = 0; i < rows; i++) {
-            if (deltasArray[i][delta.j] !== 0) {
+            if (deltasArray[i][delta.j] === 0) {
                 for (let j = 0; j < cols; j++) {
                     if (deltasArray[i][j] === 0 && deltasArray[delta.i][j] === 0) {
-                        const value = Math.min(solutionArray[i][delta.j], solutionArray[delta.i][j]);
+                        const value = Math.min(solutionArray[i][delta.j] ?? 0, solutionArray[delta.i][j] ?? 0);
 
-                        solutionArray[i][delta.j] -= value;
-                        solutionArray[delta.i][j] -= value;
-                        solutionArray[delta.i][delta.j] += value;
-                        solutionArray[i][j] += value;
+                        solutionArray[i][delta.j] = (solutionArray[i][delta.j] ?? 0) - value;
+                        solutionArray[delta.i][j] = (solutionArray[delta.i][j] ?? 0) - value;
+                        solutionArray[delta.i][delta.j] = (solutionArray[delta.i][delta.j] ?? 0) + value;
+                        solutionArray[i][j] = (solutionArray[i][j] ?? 0) + value;
+
+                        // Leaves one of the zeroes in the base solution if there are two zeroes in the negative semicycle
+                        if (solutionArray[i][delta.j] === 0 && solutionArray[delta.i][j] !== 0)
+                            solutionArray[i][delta.j] = undefined;
+
+                        if (solutionArray[delta.i][j] === 0)
+                            solutionArray[delta.i][j] = undefined;
 
                         console.log(`Znaleziono cykl: (${delta.i}, ${delta.j}) -> (${delta.i}, ${j}) -> (${i}, ${j}) -> (${i}, ${delta.j})`);
 
+                        // Because typings for mathjs are wrong and matrix can contain any values, not just numberss
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-ignore
                         return matrix(solutionArray);
                     }
                 }
@@ -66,6 +73,10 @@ const findAndApplyCycle = (solution: Matrix, deltas: Matrix) => {
     }
 
     console.warn('No cycle was found!');
+
+    // Same as above
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     return matrix(solutionArray);
 };
 
@@ -82,7 +93,7 @@ const generateInitialSolution = (suppliers: Supplier[], customers: Customer[], p
     const localSuppliers = cloneDeep(suppliers);
     const localCustomers = cloneDeep(customers);
     const profits = profitsTable.clone();
-    const solution = zeros(suppliers.length, localCustomers.length) as Matrix;
+    const solution = (zeros(localSuppliers.length, localCustomers.length) as Matrix).map(_ => undefined);
 
     if (!balanced) {
         profits.resize([suppliers.length - 1, localCustomers.length - 1]);
@@ -94,39 +105,55 @@ const generateInitialSolution = (suppliers: Supplier[], customers: Customer[], p
         .sort((a, b) => b.value - a.value);
 
     for (const profit of sortedProfits) {
-        if (localCustomers.reduce((total, b) => total + b.demand, 0) === 0 || suppliers.reduce((total, b) => total + b.supply, 0) === 0)
+        if (sum(localCustomers.map(c => c.demand)) === 0 || sum(suppliers.map(s => s.supply)) === 0)
             break;
 
-        if (suppliers[profit.i].supply > 0 && localCustomers[profit.j].demand > 0) {
+        if (localSuppliers[profit.i].supply > 0 && localCustomers[profit.j].demand > 0) {
             const routeValue = Math.min(localSuppliers[profit.i].supply, localCustomers[profit.j].demand);
 
             localSuppliers[profit.i].supply -= routeValue;
             localCustomers[profit.j].demand -= routeValue;
-            solution.set([profit.i, profit.j], routeValue);
+            solution.set([profit.i, profit.j], routeValue !== 0 ? routeValue : undefined);
+        }
+    }
+
+    const missingValuesCount = (suppliers.length + customers.length - 1) - (flatten(solution).toArray() as number[]).filter(el => el !== undefined).length;
+
+    if (missingValuesCount > 0) {
+        const [rows, cols] = solution.size();
+
+        for (let i = 0, replacedValues = 0; i < rows && replacedValues < missingValuesCount; i++) {
+            for (let j = 0; j < cols && replacedValues < missingValuesCount; j++) {
+                if (solution.get([i, j]) === undefined) {
+                    solution.set([i, j], 0);
+                    replacedValues++;
+                }
+            }
         }
     }
 
     return solution;
 };
 
-const calculateDualVariables = (suppliers: Supplier[], customers: Customer[], transportTable: Matrix, profits: Matrix): DualVariables => {
-    const size = suppliers.length + customers.length - 1;
-    const transportArr = transportTable.toArray() as number[][];
+const calculateDualVariables = (transportTable: Matrix, profits: Matrix): DualVariables => {
+    const [nSuppliers, nCustomers] = transportTable.size();
+    const size = nSuppliers + nCustomers - 1;
+    const transportArr = transportTable.toArray() as (number | undefined)[][];
 
     let A = zeros(size, size + 1) as Matrix;
 
     let currentRow = 0;
-    transportTable.forEach((val: any, [i, j]: any) => {
-        if (val > 0) {
+    transportTable.forEach((val: number | undefined, [i, j]: any) => {
+        if (val !== undefined) {
             A.set([currentRow, i], 1); // alpha
-            A.set([currentRow, suppliers.length + j], 1); // beta
+            A.set([currentRow, nSuppliers + j], 1); // beta
             currentRow++;
         }
     });
 
     const B = transportArr
         .flatMap((row, i) => (
-            row.map((val, j) => (val > 0 ? profits.get([i, j]) : undefined))
+            row.map((val, j) => (val !== undefined ? profits.get([i, j]) : undefined))
         ))
         .filter(val => val !== undefined);
 
@@ -138,8 +165,8 @@ const calculateDualVariables = (suppliers: Supplier[], customers: Customer[], tr
     const x = squeeze(lusolve(A, B) as Matrix).toArray() as number[];
 
     return {
-        alphas: [0, ...x.slice(0, suppliers.length - 1)],
-        betas: x.slice(suppliers.length - 1),
+        alphas: [0, ...x.slice(0, nSuppliers - 1)],
+        betas: x.slice(nSuppliers - 1),
     };
 };
 
@@ -157,11 +184,11 @@ export const calculateOptimalTransportTable = (suppliers: Supplier[], customers:
     if (!balanced) {
         localSuppliers.push({
             price: 0,
-            supply: customers.reduce((total, b) => total + b.demand, 0),
+            supply: sum(customers.map(s => s.demand)),
         });
         localCustomers.push({
             price: 0,
-            demand: suppliers.reduce((total, b) => total + b.supply, 0),
+            demand: sum(suppliers.map(s => s.supply)),
         });
         localCosts.resize([localSuppliers.length, localCustomers.length], 0);
         profitTable.resize([localSuppliers.length, localCustomers.length], 0);
@@ -174,7 +201,7 @@ export const calculateOptimalTransportTable = (suppliers: Supplier[], customers:
         console.groupCollapsed(`Iteracja ${i}`);
         console.table(transportTable.toArray());
 
-        const dualVariables = calculateDualVariables(localSuppliers, localCustomers, transportTable, profitTable);
+        const dualVariables = calculateDualVariables(transportTable, profitTable);
         console.log('Alfa beta', dualVariables);
 
         const deltas = getOptimalityFactor(profitTable, dualVariables);
@@ -186,13 +213,14 @@ export const calculateOptimalTransportTable = (suppliers: Supplier[], customers:
         transportTable = findAndApplyCycle(transportTable, deltas);
         console.groupEnd();
         i++;
+
         if (i > 1000)
             break;
     // eslint-disable-next-line no-constant-condition
     } while (true);
 
     console.groupEnd();
-
+    transportTable = transportTable.map(val => (val === undefined ? 0 : val));
     const totalProfit = sum(dotMultiply(transportTable, profitTable) as Matrix);
 
     console.log('Wynik');
