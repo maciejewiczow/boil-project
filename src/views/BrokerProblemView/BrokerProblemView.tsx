@@ -219,9 +219,18 @@ const BrokerProblemView: React.FC = () => {
                             </SectionHeaderText>
                             <ProfitWrapper>
                                 <ProfitLabel>Zysk</ProfitLabel>
-                                <ProfitText>{results.totalProfit}</ProfitText>
+                                <ProfitText>{results.profit}</ProfitText>
+                            </ProfitWrapper>
+                            <ProfitWrapper>
+                                <ProfitLabel>Koszt</ProfitLabel>
+                                <ProfitText>{results.cost}</ProfitText>
+                            </ProfitWrapper>
+                            <ProfitWrapper>
+                                <ProfitLabel>Przychód</ProfitLabel>
+                                <ProfitText>{results.gain}</ProfitText>
                             </ProfitWrapper>
                         </SectionHeader>
+                        <h5>Transporty</h5>
                         <Table bordered striped cellPadding="0">
                             <thead>
                                 <tr>
@@ -231,6 +240,23 @@ const BrokerProblemView: React.FC = () => {
                             </thead>
                             <tbody>
                                 {results.transportTable.map((row, i) => (
+                                    <tr>
+                                        <th>D {i + 1}</th>
+                                        {row.map(value => (<td>{value}</td>))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                        <h5>Zyski jednostkowe</h5>
+                        <Table bordered striped cellPadding="0">
+                            <thead>
+                                <tr>
+                                    <th />
+                                    {customers.map((_, i) => <th>O {i + 1}</th>)}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {results.profitTable.map((row, i) => (
                                     <tr>
                                         <th>D {i + 1}</th>
                                         {row.map(value => (<td>{value}</td>))}

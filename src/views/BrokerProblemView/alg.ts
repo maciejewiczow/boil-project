@@ -12,6 +12,7 @@ import {
     sum,
     dotMultiply,
     flatten,
+    add,
 } from 'mathjs';
 import { Supplier, Customer, DualVariables, Results } from './interfaces';
 
@@ -170,7 +171,7 @@ const calculateDualVariables = (transportTable: Matrix, profits: Matrix): DualVa
     };
 };
 
-export const calculateOptimalTransportTable = (suppliers: Supplier[], customers: Customer[], costs: number[][]): Results => {
+export const calculateOptimalTransportTable = (suppliers: Supplier[], customers: Customer[], costs: number[][], nMax = 10000): Results => {
     const localCustomers = cloneDeep(customers);
     const localSuppliers = cloneDeep(suppliers);
     const localCosts = matrix(cloneDeep(costs));
@@ -196,9 +197,9 @@ export const calculateOptimalTransportTable = (suppliers: Supplier[], customers:
 
     let transportTable = generateInitialSolution(localSuppliers, localCustomers, profitTable, balanced);
 
-    let i = 1;
+    let iteration = 1;
     do {
-        console.groupCollapsed(`Iteracja ${i}`);
+        console.groupCollapsed(`Iteracja ${iteration}`);
         console.table(transportTable.toArray());
 
         const dualVariables = calculateDualVariables(transportTable, profitTable);
@@ -212,25 +213,44 @@ export const calculateOptimalTransportTable = (suppliers: Supplier[], customers:
 
         transportTable = findAndApplyCycle(transportTable, deltas);
         console.groupEnd();
-        i++;
-
-        if (i > 1000)
-            break;
-    // eslint-disable-next-line no-constant-condition
-    } while (true);
+        iteration++;
+    } while (iteration < nMax);
 
     console.groupEnd();
     transportTable = transportTable.map(val => (val === undefined ? 0 : val));
-    const totalProfit = sum(dotMultiply(transportTable, profitTable) as Matrix);
 
     console.log('Wynik');
     console.table(transportTable.toArray());
-    console.log('Profit', totalProfit);
+
+    const profit = sum(dotMultiply(transportTable, profitTable) as Matrix);
 
     // strip fictional suppliers and customers before returning the results
     transportTable.resize([suppliers.length, customers.length]);
+    profitTable.resize([suppliers.length, customers.length]);
+
+    const puchaseCosts = map(
+        matrix(zeros(suppliers.length, customers.length)),
+        (_, [i, __]: [number, number]) => suppliers[i].price,
+    );
+
+    const cost = sum(dotMultiply(transportTable, add(puchaseCosts, costs)) as Matrix);
+
+    const gains = map(
+        matrix(zeros(suppliers.length, customers.length)),
+        (_, [__, j]: [number, number]) => customers[j].price,
+    );
+
+    const gain = sum(dotMultiply(transportTable, gains) as Matrix);
+
+    console.log('Zysk', profit);
+    console.log('Koszt', cost);
+    console.log('Przychód', gain);
+
     return {
         transportTable: transportTable.toArray() as number[][],
-        totalProfit,
+        profitTable: profitTable.toArray() as number[][],
+        cost,
+        gain,
+        profit,
     };
 };

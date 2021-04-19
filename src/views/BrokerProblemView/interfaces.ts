@@ -17,5 +17,8 @@ export interface DualVariables {
 
 export interface Results {
     transportTable: number[][];
-    totalProfit: number;
+    profitTable: number[][];
+    profit: number;
+    cost: number;
+    gain: number;
 }
