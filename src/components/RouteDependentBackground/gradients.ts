@@ -56,7 +56,7 @@ const routeGradients: RouteGradientConfig = [
         },
     },
     {
-        route: RouteNames.LinearProgramming,
+        route: RouteNames.DeliveryNetwork,
         gradient: {
             stops: [
                 {

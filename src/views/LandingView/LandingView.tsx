@@ -10,9 +10,9 @@ const LandingView: React.FC = () => (
             <CardImageWrapper src={TransportIcon} />
             <CardDescription>Zagadnienie pośrednika</CardDescription>
         </LinkCard>
-        <LinkCard to={RouteNames.LinearProgramming}>
+        <LinkCard to={RouteNames.DeliveryNetwork}>
             <CardImageWrapper src={GraphIcon} />
-            <CardDescription>Programowanie liniowe</CardDescription>
+            <CardDescription>Optymalizacja sieci dostaw</CardDescription>
         </LinkCard>
     </Wrapper>
 );

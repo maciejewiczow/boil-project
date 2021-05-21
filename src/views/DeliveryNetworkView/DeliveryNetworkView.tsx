@@ -33,7 +33,7 @@ const edges: GraphEdge[] = [
 ];
 
 // FIXME: refactor graph state to useReducer and actions, move logic out to custom hooks
-const LinearProgrammingView: React.FC = () => {
+const DeliveryNetworkView: React.FC = () => {
     const [graph, setGraph] = useState<Graph>({
         nodes,
         edges,
@@ -93,7 +93,7 @@ const LinearProgrammingView: React.FC = () => {
 
     return (
         <PageWrapper>
-            <PageHeader>Programowanie liniowe</PageHeader>
+            <PageHeader>Optymalizacja sieci dostaw</PageHeader>
             <PageContent>
                 <GraphEditor
                     graph={graph}
@@ -111,4 +111,4 @@ const LinearProgrammingView: React.FC = () => {
     );
 };
 
-export default LinearProgrammingView;
+export default DeliveryNetworkView;

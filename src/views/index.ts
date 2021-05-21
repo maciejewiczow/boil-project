@@ -1,9 +1,9 @@
 import BrokerProblemView from './BrokerProblemView/BrokerProblemView';
 import LandingView from './LandingView/LandingView';
-import LinearProgrammingView from './LinearProgrammingView/LinearProgrammingView';
+import DeliveryNetworkView from './DeliveryNetworkView/DeliveryNetworkView';
 
 export {
     BrokerProblemView,
     LandingView,
-    LinearProgrammingView,
+    DeliveryNetworkView,
 };
