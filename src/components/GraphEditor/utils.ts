@@ -30,5 +30,9 @@ export const isValidEdge = (source: INode, target: INode) => !(
         source instanceof SupplierNode && target instanceof SupplierNode
     ) || (
         source instanceof CustomerNode && target instanceof CustomerNode
+    ) || (
+        source instanceof CustomerNode
+    ) || (
+        target instanceof SupplierNode
     )
 );

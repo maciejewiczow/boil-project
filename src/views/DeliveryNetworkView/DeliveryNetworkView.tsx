@@ -9,6 +9,7 @@ import GraphEditor, {
     SupplierNode,
 } from 'components/GraphEditor';
 import { getNextSequenceNumberForNodeType, isValidEdge, updateNodeNumbers } from 'components/GraphEditor/utils';
+import { GraphDisplayer } from 'components/GraphEditor/GraphDisplayer/GraphDisplayer';
 import { GraphEntityDetails, PageContent, PageWrapper } from './parts';
 
 const nodes: GraphNode[] = [
@@ -95,12 +96,22 @@ const DeliveryNetworkView: React.FC = () => {
         <PageWrapper>
             <PageHeader>Optymalizacja sieci dostaw</PageHeader>
             <PageContent>
+                {resultGraph !== null ? (
+                    <GraphDisplayer graph={resultGraph} onReset={() => setResultGraph(null)} />
+                ) : (
                 <GraphEditor
                     graph={graph}
                     onGraphChange={g => setGraph(g)}
                     selected={selected}
                     onSelectionChange={s => setSelected(s)}
+                        onCalculateClick={async () => {
+                            setSelected(null);
+                            setResultGraph(
+                                    graph
+                            );
+                        }}
                 />
+                )}
             </PageContent>
             <GraphEntityDetails
                 selectedEntity={selected}

@@ -12,4 +12,5 @@ export interface GraphEditorProps {
     onGraphChange: (graph: Graph) => void;
     selected: GraphNode | GraphEdge | null;
     onSelectionChange: (selected: GraphNode | GraphEdge | null) => void;
+    onCalculateClick?: () => void;
 }

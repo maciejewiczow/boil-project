@@ -1,29 +1,26 @@
 import React, { useState } from 'react';
 import { GraphView, IEdge, INode } from 'react-digraph';
+import { BsChevronRight } from 'react-icons/bs';
 import { GraphEditorProps } from '../constants';
 import GraphNodeContent from '../GraphNodeContent/GraphNodeContent';
 import { GraphEdge } from '../GraphEdge';
 import { BrokerNode, GraphNode } from '../GraphNode';
 import { HelpTooltip } from '../HelpTooltip/HelpTooltip';
-import { Wrapper, GraphClickWrapper } from './parts';
+import { Wrapper, GraphClickWrapper, GoButton } from './parts';
 import { getNextSequenceNumberForNodeType, isValidEdge, updateNodeNumbers as updateNodeNumbersAfterDeletion } from '../utils';
 
-const GraphEditor: React.FC<GraphEditorProps> = ({ graph, onGraphChange, selected, onSelectionChange }) => {
+const GraphEditor: React.FC<GraphEditorProps> = ({ graph, onGraphChange, selected, onSelectionChange, onCalculateClick }) => {
     const [isHelpOpen, setIsHelpOpen] = useState(false);
 
     const selectNode = (node: INode | null) => {
-        console.log('node selected', node);
         onSelectionChange(node as GraphNode | null);
     };
 
     const selectEdge = (edge: IEdge | null) => {
-        console.log('edge selected', edge);
         onSelectionChange(edge as GraphEdge | null);
     };
 
     const addNode = (x: number, y: number) => {
-        console.log(`node created at ${x}, ${y}`);
-
         const sequenceNum = getNextSequenceNumberForNodeType(graph.nodes, BrokerNode);
 
         const newNode = new BrokerNode(sequenceNum, x, y);
@@ -39,8 +36,6 @@ const GraphEditor: React.FC<GraphEditorProps> = ({ graph, onGraphChange, selecte
     };
 
     const deleteNode = (id: string) => {
-        console.log(`node ${id} deleted`);
-
         const nodeToDelete = graph.nodes.find(n => n.id === id);
 
         if (!nodeToDelete)
@@ -53,14 +48,13 @@ const GraphEditor: React.FC<GraphEditorProps> = ({ graph, onGraphChange, selecte
 
         updateNodeNumbersAfterDeletion(nodeToDelete, graph.nodes);
 
+        onSelectionChange(null);
         onGraphChange(newGraph);
     };
 
     const addEdge = (source: INode, target: INode) => {
         if (!isValidEdge(source, target))
             return;
-
-        console.log(`Edge from ${source.id} to ${target.id}`);
 
         const newEdge = new GraphEdge(source.id, target.id, 0);
 
@@ -75,8 +69,7 @@ const GraphEditor: React.FC<GraphEditorProps> = ({ graph, onGraphChange, selecte
     };
 
     const deleteEdge = (edge: IEdge) => {
-        console.log('edge deleted', edge);
-
+        onSelectionChange(null);
         onGraphChange({
             ...graph,
             edges: graph.edges.filter(e => e.id !== edge.id),
@@ -101,7 +94,6 @@ const GraphEditor: React.FC<GraphEditorProps> = ({ graph, onGraphChange, selecte
                     renderNodeText={(data, id, isSelected) => <GraphNodeContent node={data} id={id} isSelected={isSelected} />}
                     rotateEdgeHandle={false}
                     showGraphControls={false}
-                    edgeArrowSize={0.00001}
                     canSwapEdge={() => false}
                     nodeTypes={{
                         default: {
@@ -126,10 +118,22 @@ const GraphEditor: React.FC<GraphEditorProps> = ({ graph, onGraphChange, selecte
                     nodeSubtypes={{
                         none: {
                             shapeId: '',
-                            shape: <React.Fragment />,
+                            // used as a way to insert things into <defs>
+                            shape: (
+                                <marker id="end-arrow-not-selected" viewBox="0 -4 8 8" refX="4" markerWidth="8" markerHeight="8" orient="auto">
+                                    <path d="M0,-4L8,0L0,4" width="8" height="8" />
+                                </marker>
+                            ),
                         },
                     }}
                 />
+                <GoButton
+                    variant="primary"
+                    disabled={!(graph.nodes.length > 0 && graph.edges.length > 0)}
+                    onClick={onCalculateClick}
+                >
+                    Optymalizuj <BsChevronRight />
+                </GoButton>
             </GraphClickWrapper>
         </Wrapper>
     );
