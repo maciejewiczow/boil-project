@@ -1,5 +1,5 @@
 declare module 'colormap' {
-    type ColorMapName = (
+    export type ColorMapName = (
         'jet' |
         'hsv' |
         'hot' |
@@ -62,5 +62,5 @@ declare module 'colormap' {
     function colormap(opts?: ColormapStringOptions): string[];
     function colormap(opts?: ColormapArrayOptions): [number, number, number, number][];
 
-    export = colormap;
+    export default colormap;
 }
