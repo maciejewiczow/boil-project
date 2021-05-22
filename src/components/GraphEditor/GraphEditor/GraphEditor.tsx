@@ -42,14 +42,14 @@ const GraphEditor: React.FC<GraphEditorProps> = ({ graph, onGraphChange, selecte
             return;
 
         const newGraph = {
-            ...graph,
+            edges: graph.edges.filter(edge => edge.target !== id && edge.source !== id),
             nodes: graph.nodes.filter(node => node.id !== id),
         };
 
-        updateNodeNumbersAfterDeletion(nodeToDelete, graph.nodes);
+        updateNodeNumbersAfterDeletion(nodeToDelete, newGraph.nodes);
 
-        onSelectionChange(null);
         onGraphChange(newGraph);
+        onSelectionChange(null);
     };
 
     const addEdge = (source: INode, target: INode) => {
@@ -69,11 +69,11 @@ const GraphEditor: React.FC<GraphEditorProps> = ({ graph, onGraphChange, selecte
     };
 
     const deleteEdge = (edge: IEdge) => {
-        onSelectionChange(null);
         onGraphChange({
             ...graph,
             edges: graph.edges.filter(e => e.id !== edge.id),
         });
+        onSelectionChange(null);
     };
 
     return (
