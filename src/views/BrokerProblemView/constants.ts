@@ -26,46 +26,67 @@ import { Supplier, Customer } from './interfaces';
 //     },
 // ];
 
-// // export const initialCosts: number[][] = initialSuppliers.map(_ => (
-// //    new Array(initialCustomers.length).fill(3)
-// // ));
-
 // export const initialCosts: number[][] = [
 //     [4, 7, 2],
 //     [8, 10, 4],
 // ];
 
+// export const initialSuppliers: Supplier[] = [
+//     {
+//         supply: 20,
+//         price: 10,
+//     },
+//     {
+//         supply: 30,
+//         price: 12,
+//     },
+// ];
+
+// export const initialCustomers: Customer[] = [
+//     {
+//         demand: 20,
+//         price: 60,
+//     },
+//     {
+//         demand: 28,
+//         price: 25,
+//     },
+//     {
+//         demand: 27,
+//         price: 30,
+//     },
+// ];
+
+// export const initialCosts: number[][] = [
+//     [8, 14, 17],
+//     [12, 9, 19],
+// ];
+
 export const initialSuppliers: Supplier[] = [
     {
-        supply: 20,
-        price: 10,
+        price: 0,
+        supply: 0,
     },
     {
-        supply: 30,
-        price: 12,
+        price: 0,
+        supply: 0,
     },
 ];
-
 export const initialCustomers: Customer[] = [
     {
-        demand: 20,
-        price: 60,
+        price: 0,
+        demand: 0,
     },
     {
-        demand: 28,
-        price: 25,
+        price: 0,
+        demand: 0,
     },
     {
-        demand: 27,
-        price: 30,
+        price: 0,
+        demand: 0,
     },
 ];
 
-export const initialCosts: number[][] = [
-    [8, 14, 17],
-    [12, 9, 19],
-];
-
-// export const initialCosts: number[][] = initialSuppliers.map(_ => (
-//    new Array(initialCustomers.length).fill(3)
-// ));
+export const initialCosts: number[][] = initialSuppliers.map(_ => (
+    new Array(initialCustomers.length).fill(0)
+));
