@@ -17,5 +17,7 @@ export class GraphEdge implements IEdge {
         public source: string,
         public target: string,
         public weight: number,
+        public min: number = 0,
+        public max?: number,
     ) {}
 }
