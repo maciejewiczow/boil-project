@@ -10,30 +10,38 @@ import GraphEditor, {
 } from 'components/GraphEditor';
 import { getNextSequenceNumberForNodeType, isValidEdge, updateNodeNumbers } from 'components/GraphEditor/utils';
 import { GraphDisplayer } from 'components/GraphEditor/GraphDisplayer/GraphDisplayer';
-import { GraphEntityDetails, PageContent, PageWrapper } from './parts';
-import { optimize } from './algorithm';
+import { toast } from 'react-toastify';
+import {
+    GraphEntityDetails,
+    PageContent,
+    PageWrapper,
+    SolutionButtons,
+    Button,
+    SolutionDetails,
+} from './parts';
+import { optimize, Solutions } from './algorithm';
 
 const nodes: GraphNode[] = [
-    new SupplierNode(250, 1, 0, 0),
-    new SupplierNode(300, 2, 0, 300),
-    new CustomerNode(120, 1, 500, -100),
-    new CustomerNode(250, 2, 500, 150),
-    new CustomerNode(100, 3, 500, 400),
-    new BrokerNode(1, 250, 150),
+    // new SupplierNode(250, 1, 0, 0),
+    // new SupplierNode(300, 2, 0, 300),
+    // new CustomerNode(120, 1, 500, -100),
+    // new CustomerNode(250, 2, 500, 150),
+    // new CustomerNode(100, 3, 500, 400),
+    // new BrokerNode(1, 250, 150),
 ];
 
 const edges: GraphEdge[] = [
     // new GraphEdge(nodes[0].id, nodes[1].id, 3, 30, 50),
-    new GraphEdge(nodes[0].id, nodes[2].id, 3, 30, 50),
-    new GraphEdge(nodes[0].id, nodes[5].id, 5, 0, 150),
-    new GraphEdge(nodes[1].id, nodes[5].id, 6),
-    new GraphEdge(nodes[1].id, nodes[4].id, 2),
-    new GraphEdge(nodes[2].id, nodes[3].id, 8),
-    new GraphEdge(nodes[3].id, nodes[4].id, 4),
-    new GraphEdge(nodes[5].id, nodes[2].id, 5),
-    new GraphEdge(nodes[5].id, nodes[3].id, 4),
-    new GraphEdge(nodes[5].id, nodes[4].id, 1),
-    new GraphEdge(nodes[1].id, nodes[0].id, 2),
+    // new GraphEdge(nodes[0].id, nodes[2].id, 3, 30, 50),
+    // new GraphEdge(nodes[0].id, nodes[5].id, 5, 0, 150),
+    // new GraphEdge(nodes[1].id, nodes[5].id, 6, 40),
+    // new GraphEdge(nodes[1].id, nodes[4].id, 2),
+    // new GraphEdge(nodes[2].id, nodes[3].id, 8),
+    // new GraphEdge(nodes[3].id, nodes[4].id, 4),
+    // new GraphEdge(nodes[5].id, nodes[2].id, 5),
+    // new GraphEdge(nodes[5].id, nodes[3].id, 4),
+    // new GraphEdge(nodes[5].id, nodes[4].id, 1),
+    // new GraphEdge(nodes[1].id, nodes[0].id, 2),
 ];
 
 // FIXME: refactor graph state to useReducer and actions, move logic out to custom hooks
@@ -42,12 +50,11 @@ const DeliveryNetworkView: React.FC = () => {
         nodes,
         edges,
     });
-    const [resultGraph, setResultGraph] = useState<Graph | null>(null);
+    const [showMaxFlowSolution, setShowMaxFlowSolution] = useState(false);
+    const [solutions, setSolutions] = useState<Solutions | null>(null);
     const [selected, setSelected] = useState<GraphNode | GraphEdge | null>(null);
 
     const updateEntity = (entity: GraphNode | GraphEdge) => {
-        console.log('entity updated', entity);
-
         if (entity instanceof GraphNode) {
             const newGraph = {
                 ...graph,
@@ -105,8 +112,38 @@ const DeliveryNetworkView: React.FC = () => {
         <PageWrapper>
             <PageHeader>Optymalizacja sieci dostaw</PageHeader>
             <PageContent>
-                {resultGraph !== null ? (
-                    <GraphDisplayer graph={resultGraph} onReset={() => setResultGraph(null)} />
+                {solutions !== null ? (
+                    <React.Fragment>
+                        <SolutionButtons>
+                            <Button
+                                variant="outline-primary"
+                                active={!showMaxFlowSolution}
+                                onClick={() => {
+                                    setSelected(null);
+                                    setShowMaxFlowSolution(false);
+                                }}
+                            >
+                                Min. koszt
+                            </Button>
+                            <Button
+                                variant="outline-primary"
+                                active={showMaxFlowSolution}
+                                onClick={() => {
+                                    setSelected(null);
+                                    setShowMaxFlowSolution(true);
+                                }}
+                            >
+                                Max. przepływ
+                            </Button>
+                        </SolutionButtons>
+                        <GraphDisplayer
+                            graph={!showMaxFlowSolution ? solutions.minCost.graph : solutions.maxFlow.graph}
+                            colormap={showMaxFlowSolution ? 'freesurface-blue' : 'freesurface-red'}
+                            selected={selected}
+                            onSelectionChange={s => setSelected(s)}
+                            onReset={() => setSolutions(null)}
+                        />
+                    </React.Fragment>
                 ) : (
                     <GraphEditor
                         graph={graph}
@@ -114,8 +151,12 @@ const DeliveryNetworkView: React.FC = () => {
                         selected={selected}
                         onSelectionChange={s => setSelected(s)}
                         onCalculateClick={async () => {
-                            setSelected(null);
-                            setResultGraph(await optimize(graph));
+                            try {
+                                setSolutions(await optimize(graph));
+                                setSelected(null);
+                            } catch (e) {
+                                toast.error(e.message);
+                            }
                         }}
                     />
                 )}
@@ -124,7 +165,24 @@ const DeliveryNetworkView: React.FC = () => {
                 selectedEntity={selected}
                 onEntityChange={updateEntity}
                 nodes={graph.nodes}
+                readOnly={solutions !== null}
+                edgeWeightName={solutions !== null ? 'Przepływ' : 'Koszt'}
             />
+            {solutions !== null && (
+                !showMaxFlowSolution ? (
+                    <SolutionDetails>
+                        <h5>Minimalizacja kosztów</h5>
+                        <b>Koszt: {solutions.minCost.cost}</b>
+                        Przepływ: {solutions.minCost.flow}
+                    </SolutionDetails>
+                ) : (
+                    <SolutionDetails>
+                        <h5>Maksymalizacja przepływu</h5>
+                        Koszt: {solutions.maxFlow.cost}<br />
+                        <b>Przepływ: {solutions.maxFlow.flow}</b>
+                    </SolutionDetails>
+                )
+            )}
         </PageWrapper>
     );
 };

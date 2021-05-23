@@ -1,4 +1,6 @@
-import { GLPK, LP as OptimizationProblem } from 'glpk.js';
+import { GLPK, LP as OptimizationProblem, Result } from 'glpk.js';
+import cloneDeep from 'lodash/cloneDeep';
+import zip from 'lodash/zip';
 import {
     BrokerNode,
     CustomerNode,
@@ -6,20 +8,30 @@ import {
     GraphEdge,
     SupplierNode,
 } from 'components/GraphEditor';
-import cloneDeep from 'lodash/cloneDeep';
 
 let glpk: GLPK | undefined;
 
 // this library cannot be imported in other way
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const prom = require('glpk.js').then((lib: GLPK) => {
+const libraryLoad = require('glpk.js').then((lib: GLPK) => {
     glpk = lib;
 });
 
 type VariablesDefinition = OptimizationProblem['subjectTo'][0]['vars'];
 
-const getConstraintVariablesFromEdges = (edges: GraphEdge[], nodeId: string, outboundCoefficient = 1, inboundCoefficient = -1): VariablesDefinition => ([
-    // D_k - krawędzie wchodzące do węzła
+export interface Solution {
+    graph: Graph;
+    cost: number;
+    flow: number;
+}
+
+export interface Solutions {
+    minCost: Solution;
+    maxFlow: Solution;
+}
+
+const getVariableDefsFromEdges = (edges: GraphEdge[], nodeId: string, outboundCoefficient = 1, inboundCoefficient = -1): VariablesDefinition => ([
+    //  D_k- krawędzie wchodzące do węzła
     ...edges.filter(e => e.target === nodeId).map(edge => ({
         name: edge.id,
         coef: inboundCoefficient,
@@ -31,12 +43,31 @@ const getConstraintVariablesFromEdges = (edges: GraphEdge[], nodeId: string, out
     })),
 ]);
 
-export const optimize = async (graph: Graph): Promise<Graph> => {
+const verifySolutionStatus = (solution: Result): void => {
     if (!glpk)
-        await prom;
+        return;
+
+    const { status } = solution.result;
+
+    if (status === glpk.GLP_UNDEF)
+        throw new Error('Zagadnienie nie ma rozwiązania');
+
+    if (status === glpk.GLP_INFEAS)
+        throw new Error('Znalezione rozwiązanie jest niewykonalne');
+
+    if (status === glpk.GLP_NOFEAS)
+        throw new Error('Zagadnienie nie posiada wykonalnego rozwiązania');
+
+    if (status === glpk.GLP_UNBND)
+        throw new Error('Zagadnienie wydaje się być nieograniczone');
+};
+
+export const optimize = async (graph: Graph): Promise<Solutions> => {
+    if (!glpk)
+        await libraryLoad;
 
     if (!glpk)
-        throw Error('GLPK failed to load');
+        throw new Error('GLPK failed to load');
 
     const { nodes, edges } = graph;
 
@@ -53,7 +84,7 @@ export const optimize = async (graph: Graph): Promise<Graph> => {
             // odbiorcy
             ...nodes.filter(node => node instanceof CustomerNode).map(node => ({
                 name: `${node.title} (${node.id})`,
-                vars: getConstraintVariablesFromEdges(edges, node.id, -1, 1),
+                vars: getVariableDefsFromEdges(edges, node.id, -1, 1),
                 bnds: {
                     type: glpk!.GLP_LO, // lower bound only
                     lb: (node as CustomerNode).demand,
@@ -63,7 +94,7 @@ export const optimize = async (graph: Graph): Promise<Graph> => {
             // dostawcy
             ...nodes.filter(node => node instanceof SupplierNode).map(node => ({
                 name: `${node.title} (${node.id})`,
-                vars: getConstraintVariablesFromEdges(edges, node.id, 1, -1),
+                vars: getVariableDefsFromEdges(edges, node.id, 1, -1),
                 bnds: {
                     type: glpk!.GLP_UP, // upper bound only
                     lb: 0,
@@ -73,7 +104,7 @@ export const optimize = async (graph: Graph): Promise<Graph> => {
             // pośrednicy
             ...nodes.filter(node => node instanceof BrokerNode).map(node => ({
                 name: `${node.title} (${node.id})`,
-                vars: getConstraintVariablesFromEdges(edges, node.id, 1, -1),
+                vars: getVariableDefsFromEdges(edges, node.id, 1, -1),
                 bnds: {
                     type: glpk!.GLP_FX, // fixed variable (= 0)
                     lb: 0,
@@ -111,18 +142,58 @@ export const optimize = async (graph: Graph): Promise<Graph> => {
 
     console.log(problem);
 
-    const solution = glpk.solve(problem, { msglev: glpk.GLP_MSG_DBG });
+    const minCostSolution = glpk.solve(problem, { msglev: glpk.GLP_MSG_DBG });
 
-    console.log(solution);
+    verifySolutionStatus(minCostSolution);
 
-    const newGraph = cloneDeep(graph);
+    console.log(minCostSolution);
 
-    for (const [id, value] of Object.entries(solution.result.vars)) {
-        const edge = newGraph.edges.find(e => e.id === id);
+    problem.name = 'Maksymalizacja przepływu';
+    problem.objective = {
+        direction: glpk.GLP_MAX,
+        name: 'Sumaryczny przepływ dóbr w sieci',
+        vars: nodes.filter(node => node instanceof SupplierNode).flatMap(node => getVariableDefsFromEdges(graph.edges, node.id, 1, -1)),
+    };
+
+    console.log(problem);
+
+    const maxFlowSolution = glpk.solve(problem, { msglev: glpk.GLP_MSG_ALL });
+
+    verifySolutionStatus(maxFlowSolution);
+
+    console.log(maxFlowSolution);
+
+    const minCostGraph = cloneDeep(graph);
+    const maxFlowGraph = cloneDeep(graph);
+
+    for (const [id, value] of Object.entries(minCostSolution.result.vars)) {
+        const edge = minCostGraph.edges.find(e => e.id === id);
 
         if (edge)
             edge.weight = value;
     }
 
-    return newGraph;
+    for (const [id, value] of Object.entries(maxFlowSolution.result.vars)) {
+        const edge = maxFlowGraph.edges.find(e => e.id === id);
+
+        if (edge)
+            edge.weight = value;
+    }
+
+    return {
+        minCost: {
+            graph: minCostGraph,
+            flow: minCostGraph.nodes.filter(node => node instanceof SupplierNode).map(node => ({
+                inflow: minCostGraph.edges.filter(e => e.target === node.id).reduce((total, edge) => total + edge.weight, 0),
+                out: minCostGraph.edges.filter(e => e.source === node.id).reduce((total, edge) => total + edge.weight, 0),
+            }))
+                .reduce((total, { inflow, out }) => total + (out - inflow), 0),
+            cost: minCostSolution.result.z,
+        },
+        maxFlow: {
+            graph: maxFlowGraph,
+            flow: maxFlowSolution.result.z,
+            cost: zip(graph.edges, maxFlowGraph.edges).reduce((total, [e1, e2]) => total + (e1?.weight ?? 0) * (e2?.weight ?? 0), 0),
+        },
+    };
 };
