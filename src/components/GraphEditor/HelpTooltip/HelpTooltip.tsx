@@ -15,9 +15,9 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({
     <Wrapper className={className}>
         <Icon onClick={onIconClick} />
         <HelpBody hidden={!isTootlipOpen}>
-            DEL - usuniecie zaznaczonego elementu<br />
             SHIFT + kliknięcie - nowy węzeł<br />
             SHIFT + kliknięcie na węzeł + przeciągnięcie - utworzenie nowej krawędzi <br />
+            DEL - usuniecie zaznaczonego elementu<br />
         </HelpBody>
     </Wrapper>
 );

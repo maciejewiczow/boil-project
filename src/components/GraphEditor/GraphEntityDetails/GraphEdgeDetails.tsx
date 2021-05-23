@@ -1,8 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
+import Button from 'react-bootstrap/esm/Button';
 import Form from 'react-bootstrap/Form';
 import { GraphEdge } from '../GraphEdge';
 import { GraphNode } from '../GraphNode';
-import { Arrow, FormWrapper, Subtitle, Title } from './parts';
+import {
+    AddConstraintsWrapper,
+    Arrow,
+    ConstraintsHeader,
+    ConstraintsText,
+    FormWrapper,
+    Subtitle,
+    Title,
+} from './parts';
 
 interface GraphEdgeDetailsProps {
     selectedEdge: GraphEdge;
@@ -14,10 +23,11 @@ interface GraphEdgeDetailsProps {
 
 export const GraphEdgeDetails: React.FC<GraphEdgeDetailsProps> = ({ nodes, selectedEdge, onEdgeChange, readOnly = false, edgeWeightName = 'Koszt' }) => {
     const inputRef = React.useRef<HTMLInputElement>(null);
+    const [showFlowConstraints, setShowFlowConstraints] = useState(false);
 
     React.useEffect(() => {
         if (!readOnly) {
-        inputRef.current?.focus();
+            inputRef.current?.focus();
             setShowFlowConstraints(false);
         }
     }, [selectedEdge.id, readOnly]);
@@ -28,13 +38,37 @@ export const GraphEdgeDetails: React.FC<GraphEdgeDetailsProps> = ({ nodes, selec
     if (!sourceNode || !targetNode)
         return null;
 
-    const updateEdge = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const updateEdgeWeight = (e: React.ChangeEvent<HTMLInputElement>) => {
         onEdgeChange(
             Object.assign(
                 selectedEdge,
                 { weight: Number.isNaN(e.target.valueAsNumber) ? 0 : e.target.valueAsNumber },
             ),
         );
+    };
+
+    const updateEdgeMinFlow = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newEdge = Object.assign(
+            selectedEdge,
+            { min: Number.isNaN(e.target.valueAsNumber) ? 0 : e.target.valueAsNumber },
+        );
+
+        if (newEdge.max !== undefined && newEdge.min > newEdge.max)
+            newEdge.min = newEdge.max;
+
+        onEdgeChange(newEdge);
+    };
+
+    const updateEdgeMaxFlow = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newEdge = Object.assign(
+            selectedEdge,
+            { max: Number.isNaN(e.target.valueAsNumber) ? undefined : e.target.valueAsNumber },
+        );
+
+        if (newEdge.max !== undefined && newEdge.min > newEdge.max)
+            newEdge.max = newEdge.min;
+
+        onEdgeChange(newEdge);
     };
 
     return (
@@ -49,10 +83,45 @@ export const GraphEdgeDetails: React.FC<GraphEdgeDetailsProps> = ({ nodes, selec
                         type="number"
                         min="0"
                         value={selectedEdge.weight}
+                        onChange={updateEdgeWeight}
                         disabled={readOnly}
                         readOnly={readOnly}
                     />
                 </Form.Group>
+                {((selectedEdge.min === 0 && selectedEdge.max === undefined) && !showFlowConstraints) ? (
+                    !readOnly && (
+                        <AddConstraintsWrapper>
+                            <ConstraintsText>Ogranicz przepływ</ConstraintsText>
+                            <Button variant="outline-success" onClick={() => setShowFlowConstraints(true)}>+</Button>
+                        </AddConstraintsWrapper>
+                    )
+                ) : (
+                    <React.Fragment>
+                        <ConstraintsHeader>Ograniczenia przepływu</ConstraintsHeader>
+                        <Form.Group controlId="minFlow">
+                            <Form.Label>Minimalny</Form.Label>
+                            <Form.Control
+                                type="number"
+                                min="0"
+                                value={selectedEdge.min}
+                                onChange={updateEdgeMinFlow}
+                                disabled={readOnly}
+                                readOnly={readOnly}
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="maxFlow">
+                            <Form.Label>Maksymalny</Form.Label>
+                            <Form.Control
+                                type="number"
+                                min="0"
+                                value={selectedEdge.max}
+                                onChange={updateEdgeMaxFlow}
+                                disabled={readOnly}
+                                readOnly={readOnly}
+                            />
+                        </Form.Group>
+                    </React.Fragment>
+                )}
             </FormWrapper>
         </React.Fragment>
     );

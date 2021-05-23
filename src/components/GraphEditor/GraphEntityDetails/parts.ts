@@ -38,3 +38,18 @@ export const FormGroup = styled(Form.Group)`
 export const FormWrapper = styled.div`
     margin-top: 12px;
 `;
+
+export const AddConstraintsWrapper = styled.div`
+    display: flex;
+    align-items: center;
+`;
+
+export const ConstraintsText = styled.div`
+    flex-grow: 1;
+    margin-right: 3px;
+`;
+
+export const ConstraintsHeader = styled.div`
+    margin-bottom: 6px;
+    font-size: 18px;
+`;

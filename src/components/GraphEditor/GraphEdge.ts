@@ -6,6 +6,15 @@ export class GraphEdge implements IEdge {
     type = 'default';
 
     get handleText() {
+        if (this.min !== 0 && this.max !== undefined)
+            return `◊ ${this.weight}`;
+
+        if (this.max !== undefined)
+            return `∧ ${this.weight}`;
+
+        if (this.min !== 0)
+            return `∨ ${this.weight}`;
+
         return this.weight.toString();
     }
 
