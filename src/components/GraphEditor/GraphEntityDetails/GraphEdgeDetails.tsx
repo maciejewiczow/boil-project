@@ -8,14 +8,19 @@ interface GraphEdgeDetailsProps {
     selectedEdge: GraphEdge;
     onEdgeChange: (edge: GraphEdge) => void;
     nodes: GraphNode[];
+    readOnly?: boolean;
+    edgeWeightName?: string;
 }
 
-export const GraphEdgeDetails: React.FC<GraphEdgeDetailsProps> = ({ nodes, selectedEdge, onEdgeChange }) => {
+export const GraphEdgeDetails: React.FC<GraphEdgeDetailsProps> = ({ nodes, selectedEdge, onEdgeChange, readOnly = false, edgeWeightName = 'Koszt' }) => {
     const inputRef = React.useRef<HTMLInputElement>(null);
 
     React.useEffect(() => {
+        if (!readOnly) {
         inputRef.current?.focus();
-    }, [selectedEdge.id]);
+            setShowFlowConstraints(false);
+        }
+    }, [selectedEdge.id, readOnly]);
 
     const sourceNode = React.useMemo(() => nodes.find(n => n.id === selectedEdge.source), [nodes, selectedEdge.source]);
     const targetNode = React.useMemo(() => nodes.find(n => n.id === selectedEdge.target), [nodes, selectedEdge.target]);
@@ -38,13 +43,14 @@ export const GraphEdgeDetails: React.FC<GraphEdgeDetailsProps> = ({ nodes, selec
             <Title>{sourceNode.title} <Arrow /> {targetNode.title}</Title>
             <FormWrapper>
                 <Form.Group controlId="edgeWeight">
-                    <Form.Label>Koszt</Form.Label>
+                    <Form.Label>{edgeWeightName}</Form.Label>
                     <Form.Control
                         ref={inputRef}
                         type="number"
                         min="0"
                         value={selectedEdge.weight}
-                        onChange={updateEdge}
+                        disabled={readOnly}
+                        readOnly={readOnly}
                     />
                 </Form.Group>
             </FormWrapper>

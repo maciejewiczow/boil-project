@@ -7,14 +7,16 @@ import { FormWrapper, Subtitle, Title } from './parts';
 interface GraphNodeDetailsProps {
     selectedNode: GraphNode;
     onNodeChange: (node: GraphNode) => void;
+    readOnly?: boolean;
 }
 
-export const GraphNodeDetails: React.FC<GraphNodeDetailsProps> = ({ selectedNode, onNodeChange }) => {
+export const GraphNodeDetails: React.FC<GraphNodeDetailsProps> = ({ selectedNode, onNodeChange, readOnly = false }) => {
     const inputRef = React.useRef<HTMLSelectElement>(null);
 
     useEffect(() => {
-        inputRef.current?.focus();
-    }, [selectedNode.id]);
+        if (!readOnly)
+            inputRef.current?.focus();
+    }, [selectedNode.id, readOnly]);
 
     const updateNodeType = (e: React.ChangeEvent<HTMLSelectElement>) => {
         let newNode: GraphNode;
@@ -66,7 +68,7 @@ export const GraphNodeDetails: React.FC<GraphNodeDetailsProps> = ({ selectedNode
             <FormWrapper>
                 <FormGroup controlId="nodeType">
                     <Form.Label>Typ węzła</Form.Label>
-                    <Form.Control ref={inputRef} as="select" value={selectedNode.constructor.name} onChange={updateNodeType}>
+                    <Form.Control disabled={readOnly} readOnly={readOnly} ref={inputRef} as="select" value={selectedNode.constructor.name} onChange={updateNodeType}>
                         <option value={SupplierNode.name}>Dostawca</option>
                         <option value={BrokerNode.name}>Pośrednik</option>
                         <option value={CustomerNode.name}>Odbiorca</option>
@@ -77,13 +79,13 @@ export const GraphNodeDetails: React.FC<GraphNodeDetailsProps> = ({ selectedNode
                         {selectedNode instanceof SupplierNode && (
                             <React.Fragment>
                                 <Form.Label>Podaż</Form.Label>
-                                <Form.Control type="number" min="0" value={selectedNode.supply} onChange={updateSupplierNodeValue} />
+                                <Form.Control disabled={readOnly} readOnly={readOnly} type="number" min="0" value={selectedNode.supply} onChange={updateSupplierNodeValue} />
                             </React.Fragment>
                         )}
                         {selectedNode instanceof CustomerNode && (
                             <React.Fragment>
                                 <Form.Label>Popyt</Form.Label>
-                                <Form.Control type="number" min="0" value={selectedNode.demand} onChange={updateCustomerNodeValue} />
+                                <Form.Control disabled={readOnly} readOnly={readOnly} type="number" min="0" value={selectedNode.demand} onChange={updateCustomerNodeValue} />
                             </React.Fragment>
                         )}
                     </FormGroup>

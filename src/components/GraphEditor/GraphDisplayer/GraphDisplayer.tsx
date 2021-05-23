@@ -1,16 +1,19 @@
 import React from 'react';
 import Color from 'color';
-import { GraphView, IEdge } from 'react-digraph';
+import { GraphView, IEdge, INode } from 'react-digraph';
 import colormap, { ColorMapName } from 'colormap';
 import { BsChevronLeft } from 'react-icons/bs';
 import { Graph } from '../constants';
 import GraphNodeContent from '../GraphNodeContent/GraphNodeContent';
 import { GraphEdge } from '../GraphEdge';
 import { BackButton, Wrapper } from './parts';
+import { GraphNode } from '../GraphNode';
 
 interface GraphDisplayerProps {
     graph: Graph;
     onReset?: () => void;
+    selected: GraphNode | GraphEdge | null;
+    onSelectionChange: (selected: GraphNode | GraphEdge | null) => void;
     colormap?: ColorMapName;
 }
 
@@ -31,7 +34,7 @@ const getEdgeColor = (colors: string[], weight: number, min: number, max: number
     return new Color(colors[indexLower]).mix(new Color(colors[indexUpper]), (ind - indexLower));
 };
 
-export const GraphDisplayer: React.FC<GraphDisplayerProps> = ({ graph, onReset, colormap: colorMapName = 'freesurface-red' }) => {
+export const GraphDisplayer: React.FC<GraphDisplayerProps> = ({ graph, onReset, colormap: colorMapName = 'freesurface-red', onSelectionChange, selected }) => {
     const colors = React.useMemo(
         () => (
             colormap({
@@ -67,13 +70,24 @@ export const GraphDisplayer: React.FC<GraphDisplayerProps> = ({ graph, onReset, 
         edgeTextWrapper.style.stroke = color.toString();
     };
 
+    const selectNode = (node: INode | null) => {
+        onSelectionChange(node as GraphNode | null);
+    };
+
+    const selectEdge = (edge: IEdge | null) => {
+        onSelectionChange(edge as GraphEdge | null);
+    };
+
     return (
         <Wrapper>
             <GraphView
                 nodeKey="id"
                 nodes={graph.nodes}
                 edges={graph.edges}
-                renderNodeText={(data, id, _) => <GraphNodeContent node={data} id={id} isSelected={false} />}
+                selected={selected}
+                onSelectEdge={selectEdge}
+                onSelectNode={selectNode}
+                renderNodeText={(data, id, isSelected) => <GraphNodeContent node={data} id={id} isSelected={isSelected} />}
                 rotateEdgeHandle={false}
                 showGraphControls={false}
                 afterRenderEdge={setEdgeColor}

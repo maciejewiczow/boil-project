@@ -10,9 +10,11 @@ interface GraphEntityDetailsProps {
     selectedEntity: GraphNode | GraphEdge | null;
     nodes: GraphNode[];
     onEntityChange: (entity: GraphNode | GraphEdge) => void;
+    readOnly?: boolean;
+    edgeWeightName?: string;
 }
 
-export const GraphEntityDetails: React.FC<GraphEntityDetailsProps> = ({ className, nodes, selectedEntity, onEntityChange }) => {
+export const GraphEntityDetails: React.FC<GraphEntityDetailsProps> = ({ className, nodes, selectedEntity, onEntityChange, edgeWeightName, readOnly = false }) => {
     if (selectedEntity === null)
         return null;
 
@@ -23,11 +25,14 @@ export const GraphEntityDetails: React.FC<GraphEntityDetailsProps> = ({ classNam
                     selectedEdge={selectedEntity}
                     onEdgeChange={onEntityChange}
                     nodes={nodes}
+                    readOnly={readOnly}
+                    edgeWeightName={edgeWeightName}
                 />
             ) : (
                 <GraphNodeDetails
                     selectedNode={selectedEntity}
                     onNodeChange={onEntityChange}
+                    readOnly={readOnly}
                 />
             )}
         </Wrapper>
