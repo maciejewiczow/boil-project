@@ -1,7 +1,13 @@
 import React, { useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
 import FormGroup from 'react-bootstrap/esm/FormGroup';
-import { BrokerNode, CustomerNode, GraphNode, SupplierNode } from '../GraphNode';
+import {
+    BrokerNode,
+    CustomerNode,
+    GraphNode,
+    NodeType,
+    SupplierNode,
+} from '../GraphNode';
 import { FormWrapper, Subtitle, Title } from './parts';
 
 interface GraphNodeDetailsProps {
@@ -20,14 +26,14 @@ export const GraphNodeDetails: React.FC<GraphNodeDetailsProps> = ({ selectedNode
 
     const updateNodeType = (e: React.ChangeEvent<HTMLSelectElement>) => {
         let newNode: GraphNode;
-        switch (e.target.value) {
-            case BrokerNode.name:
+        switch (e.target.value as NodeType) {
+            case NodeType.Broker:
                 newNode = new BrokerNode(0);
                 break;
-            case CustomerNode.name:
+            case NodeType.Customer:
                 newNode = new CustomerNode(0, 0);
                 break;
-            case SupplierNode.name:
+            case NodeType.Supplier:
                 newNode = new SupplierNode(0, 0);
                 break;
             default:
@@ -68,10 +74,10 @@ export const GraphNodeDetails: React.FC<GraphNodeDetailsProps> = ({ selectedNode
             <FormWrapper>
                 <FormGroup controlId="nodeType">
                     <Form.Label>Typ węzła</Form.Label>
-                    <Form.Control disabled={readOnly} readOnly={readOnly} ref={inputRef} as="select" value={selectedNode.constructor.name} onChange={updateNodeType}>
-                        <option value={SupplierNode.name}>Dostawca</option>
-                        <option value={BrokerNode.name}>Pośrednik</option>
-                        <option value={CustomerNode.name}>Odbiorca</option>
+                    <Form.Control disabled={readOnly} readOnly={readOnly} ref={inputRef} as="select" value={selectedNode.nodeType} onChange={updateNodeType}>
+                        <option value={NodeType.Supplier}>Dostawca</option>
+                        <option value={NodeType.Broker}>Pośrednik</option>
+                        <option value={NodeType.Customer}>Odbiorca</option>
                     </Form.Control>
                 </FormGroup>
                 {selectedNode instanceof BrokerNode || (

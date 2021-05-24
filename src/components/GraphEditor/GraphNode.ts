@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import { INode } from 'react-digraph';
 import { v4 as uuid } from 'uuid';
 
@@ -14,21 +15,34 @@ export abstract class GraphNode implements INode {
 
     abstract get title(): string;
     abstract get typeName(): string;
+    abstract get nodeType(): NodeType;
+}
+
+export enum NodeType {
+    Supplier = 'Supplier',
+    Broker = 'Broker',
+    Customer = 'Customer',
 }
 
 export class BrokerNode extends GraphNode {
+    get nodeType() {
+        return NodeType.Broker;
+    }
+
     get title() {
         return `P ${this.sequenceNumber}`;
     }
 
-    // eslint-disable-next-line class-methods-use-this
     get typeName() {
         return 'Pośrednik';
     }
 }
 
 export class CustomerNode extends GraphNode {
-    // eslint-disable-next-line class-methods-use-this
+    get nodeType() {
+        return NodeType.Customer;
+    }
+
     get typeName(): string {
         return 'Odbiorca';
     }
@@ -48,7 +62,10 @@ export class CustomerNode extends GraphNode {
 }
 
 export class SupplierNode extends GraphNode {
-    // eslint-disable-next-line class-methods-use-this
+    get nodeType() {
+        return NodeType.Supplier;
+    }
+
     get typeName(): string {
         return 'Dostawca';
     }
