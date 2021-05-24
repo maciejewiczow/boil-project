@@ -31,10 +31,9 @@ const nodes: GraphNode[] = [
 ];
 
 const edges: GraphEdge[] = [
-    // new GraphEdge(nodes[0].id, nodes[1].id, 3, 30, 50),
     // new GraphEdge(nodes[0].id, nodes[2].id, 3, 30, 50),
     // new GraphEdge(nodes[0].id, nodes[5].id, 5, 0, 150),
-    // new GraphEdge(nodes[1].id, nodes[5].id, 6, 40),
+    // new GraphEdge(nodes[1].id, nodes[5].id, 6),
     // new GraphEdge(nodes[1].id, nodes[4].id, 2),
     // new GraphEdge(nodes[2].id, nodes[3].id, 8),
     // new GraphEdge(nodes[3].id, nodes[4].id, 4),

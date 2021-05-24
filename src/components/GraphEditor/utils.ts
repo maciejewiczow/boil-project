@@ -25,14 +25,6 @@ export const getNextSequenceNumberForNodeType = (nodes: GraphNode[], nodeType: t
     ) + 1
 );
 
-export const isValidEdge = (source: INode, target: INode) => !(
-    (
-        source instanceof SupplierNode && target instanceof SupplierNode
-    ) || (
-        source instanceof CustomerNode && target instanceof CustomerNode
-    ) || (
-        source instanceof CustomerNode
-    ) || (
-        target instanceof SupplierNode
-    )
+export const isValidEdge = (source: INode, target: INode) => (
+    true
 );
