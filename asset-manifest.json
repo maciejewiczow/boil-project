@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.js": "/boil-project/static/js/main.a8aa8143.chunk.js",
-    "main.js.map": "/boil-project/static/js/main.a8aa8143.chunk.js.map",
+    "main.js": "/boil-project/static/js/main.54abbda4.chunk.js",
+    "main.js.map": "/boil-project/static/js/main.54abbda4.chunk.js.map",
     "runtime-main.js": "/boil-project/static/js/runtime-main.3c8e676b.js",
     "runtime-main.js.map": "/boil-project/static/js/runtime-main.3c8e676b.js.map",
     "static/css/2.108bfca2.chunk.css": "/boil-project/static/css/2.108bfca2.chunk.css",
-    "static/js/2.88113b0d.chunk.js": "/boil-project/static/js/2.88113b0d.chunk.js",
-    "static/js/2.88113b0d.chunk.js.map": "/boil-project/static/js/2.88113b0d.chunk.js.map",
+    "static/js/2.7a161602.chunk.js": "/boil-project/static/js/2.7a161602.chunk.js",
+    "static/js/2.7a161602.chunk.js.map": "/boil-project/static/js/2.7a161602.chunk.js.map",
     "index.html": "/boil-project/index.html",
     "static/css/2.108bfca2.chunk.css.map": "/boil-project/static/css/2.108bfca2.chunk.css.map",
-    "static/js/2.88113b0d.chunk.js.LICENSE.txt": "/boil-project/static/js/2.88113b0d.chunk.js.LICENSE.txt",
+    "static/js/2.7a161602.chunk.js.LICENSE.txt": "/boil-project/static/js/2.7a161602.chunk.js.LICENSE.txt",
     "static/media/graph.e1c9b01a.svg": "/boil-project/static/media/graph.e1c9b01a.svg",
     "static/media/transport-icon-6.15287559.svg": "/boil-project/static/media/transport-icon-6.15287559.svg"
   },
   "entrypoints": [
     "static/js/runtime-main.3c8e676b.js",
     "static/css/2.108bfca2.chunk.css",
-    "static/js/2.88113b0d.chunk.js",
-    "static/js/main.a8aa8143.chunk.js"
+    "static/js/2.7a161602.chunk.js",
+    "static/js/main.54abbda4.chunk.js"
   ]
 }
