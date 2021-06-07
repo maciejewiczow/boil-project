@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.js": "/boil-project/static/js/main.3b57457c.chunk.js",
-    "main.js.map": "/boil-project/static/js/main.3b57457c.chunk.js.map",
+    "main.js": "/boil-project/static/js/main.e488a4c0.chunk.js",
+    "main.js.map": "/boil-project/static/js/main.e488a4c0.chunk.js.map",
     "runtime-main.js": "/boil-project/static/js/runtime-main.3c8e676b.js",
     "runtime-main.js.map": "/boil-project/static/js/runtime-main.3c8e676b.js.map",
     "static/css/2.108bfca2.chunk.css": "/boil-project/static/css/2.108bfca2.chunk.css",
@@ -17,6 +17,6 @@
     "static/js/runtime-main.3c8e676b.js",
     "static/css/2.108bfca2.chunk.css",
     "static/js/2.88113b0d.chunk.js",
-    "static/js/main.3b57457c.chunk.js"
+    "static/js/main.e488a4c0.chunk.js"
   ]
 }
