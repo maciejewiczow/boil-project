@@ -5,7 +5,7 @@ import { BrokerProblemView, LandingView, DeliveryNetworkView } from 'views';
 import { RouteNames } from './appConstants';
 
 const App: React.FC = () => (
-    <BrowserRouter>
+    <BrowserRouter basename="/boil-project">
         <RouteDependentBackground>
             <Switch>
                 <Route path={RouteNames.BrokerProblem} component={BrokerProblemView} />
